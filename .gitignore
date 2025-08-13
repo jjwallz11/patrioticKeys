@@ -4,6 +4,10 @@ build
 .DS_Store
 *.db
 .venv
+BROWSER_TESTS.MD
+BACKEND_COMMANDS.MD
+PSQLCommand.MD
+docker-compose.yml
 
 # OSX
 #

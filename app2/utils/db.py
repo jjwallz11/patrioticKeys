@@ -1,11 +1,20 @@
 # app/utils/db.py
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import declarative_base
-from config import settings
+from config import resolve_database_url
 
-# Convert sync-style DATABASE_URL to asyncpg-compatible format
-DATABASE_URL = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+# Handle different database types for async connections
+database_url = resolve_database_url()
+if database_url.startswith("sqlite"):
+    # Convert SQLite URL to use aiosqlite async driver
+    DATABASE_URL = database_url.replace("sqlite:///", "sqlite+aiosqlite:///")
+elif database_url.startswith("postgresql"):
+    # Convert PostgreSQL URL to use asyncpg driver
+    DATABASE_URL = database_url.replace("postgresql://", "postgresql+asyncpg://")
+else:
+    DATABASE_URL = database_url
 
 # Create async engine
 engine = create_async_engine(DATABASE_URL, echo=True)

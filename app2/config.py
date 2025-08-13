@@ -30,7 +30,7 @@ def resolve_database_url():
 
 class Settings(BaseSettings):
     # === Server ===
-    PORT: int = 2911
+    PORT: int = 2913
     HOST: str = "0.0.0.0"
 
     # === Environment ===
