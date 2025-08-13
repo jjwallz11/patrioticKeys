@@ -2,7 +2,6 @@
 
 import asyncio
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from utils.db import AsyncSessionLocal, Base, engine
 from models.users import User
@@ -27,7 +26,7 @@ async def seed_users():
         if admin_email not in existing_emails:
             admin = User(
                 email=admin_email,
-                password_hash=hash_password("BAtFitFMA13#*"),
+                hashed_password=hash_password("BAtFitFMA13#*"),
                 first_name="Johnny",
                 last_name="Wallz",
                 role="admin"
@@ -38,7 +37,7 @@ async def seed_users():
         if locksmith_email not in existing_emails:
             locksmith = User(
                 email=locksmith_email,
-                password_hash=hash_password("password"),
+                hashed_password=hash_password("password"),
                 first_name="Abelino",
                 last_name="Solis",
                 role="locksmith"
@@ -49,7 +48,7 @@ async def seed_users():
         if owner_email not in existing_emails:
             owner = User(
                 email=owner_email,
-                password_hash=hash_password("password"),
+                hashed_password=hash_password("password"),
                 first_name="Joel",
                 last_name="Gonzalez",
                 role="owner"

@@ -8,7 +8,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     email = Column(String, unique=True, index=True, nullable=False)
-    password_hash = Column(String, nullable=False)
+    hashed_password = Column(String, nullable=False)
     first_name = Column(String, nullable=True)  # Optional for company owners, required for admins
     last_name = Column(String, nullable=True)   # Optional for company owners, required for admins
     company = Column(String, nullable=True)     # Optional field for company name
