@@ -1,4 +1,4 @@
-# app/schemas/invoices.py
+# app/schemas/invoice_schemas.py
 
 from pydantic import BaseModel, Field
 

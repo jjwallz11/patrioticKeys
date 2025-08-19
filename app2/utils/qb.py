@@ -3,8 +3,6 @@
 import os
 import httpx
 from datetime import date
-from fastapi import Request
-from utils.tokens import get_session_id
 from utils.session import session_store
 
 QB_BASE = "https://quickbooks.api.intuit.com/v3/company"

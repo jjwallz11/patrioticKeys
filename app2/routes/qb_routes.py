@@ -5,13 +5,12 @@ from .auth_routes import get_current_user
 from utils.qb import (
     search_customers,
     create_customer,
-    create_invoice_item,
     clear_session_customer,
     get_or_create_today_invoice
 )
-from utils.tokens import get_session_id
+from utils.session import get_session_id, set_current_qb_customer
 from utils.csrf import verify_csrf
-from utils.session import set_current_qb_customer
+from services import add_job_to_invoice
 
 router = APIRouter()
 
@@ -49,7 +48,7 @@ async def add_invoice_item(
     payload: dict = Body(...),
     _ = Depends(get_current_user),
 ):
-    return await create_invoice_item(payload)
+    return await add_job_to_invoice(payload)
 
 # Get current stored customer for session
 @router.get("/session-customer")

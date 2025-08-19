@@ -2,9 +2,8 @@
 
 from fastapi import APIRouter, HTTPException, Request
 from schemas.job_schemas import JobCreate
-from services.invoice_services import create_job_invoice
+from services.invoice_services import add_job_to_invoice
 from utils.csrf import verify_csrf
-from utils.session import is_user_authenticated
 from routes.vehicle_routes import fetch_vehicle_data
 
 router = APIRouter()
@@ -12,9 +11,6 @@ router = APIRouter()
 @router.post("/locksmith")
 async def locksmith_job(payload: JobCreate, request: Request):
     verify_csrf(request)
-
-    if not is_user_authenticated(request):
-        raise HTTPException(status_code=403, detail="User not authorized")
 
     try:
         vehicle = await fetch_vehicle_data(payload.vin)
@@ -24,7 +20,7 @@ async def locksmith_job(payload: JobCreate, request: Request):
         raise HTTPException(status_code=502, detail="Failed to decode VIN")
 
     try:
-        updated_invoice = await create_job_invoice(payload, vehicle, request)
+        updated_invoice = await add_job_to_invoice(payload, vehicle, request)
     except HTTPException:
         raise
 

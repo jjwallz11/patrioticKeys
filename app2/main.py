@@ -6,8 +6,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import router
 from config import settings
+from utils import session
 
 app = FastAPI(title="Patriotic Keys API", debug=settings.DEBUG)
+app.state.session_store = session.session_store
 
 # CORS setup
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
