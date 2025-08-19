@@ -6,7 +6,8 @@ from utils.qb import (
     search_customers,
     create_customer,
     clear_session_customer,
-    get_or_create_today_invoice
+    get_or_create_today_invoice,
+    get_all_qb_items
 )
 from utils.session import get_session_id, set_current_qb_customer
 from utils.csrf import verify_csrf
@@ -41,6 +42,11 @@ async def get_or_create_invoice_today(
     verify_csrf(request)
     set_current_qb_customer(customer_id)
     return await get_or_create_today_invoice(customer_id)
+
+@router.get("/qb/items")
+async def get_items():
+    items = await get_all_qb_items()
+    return {"items": items}
 
 # Add line item to invoice (existing or new)
 @router.post("/invoices/items")

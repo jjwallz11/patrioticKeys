@@ -20,7 +20,13 @@ async def locksmith_job(payload: JobCreate, request: Request):
         raise HTTPException(status_code=502, detail="Failed to decode VIN")
 
     try:
-        updated_invoice = await add_job_to_invoice(payload, vehicle, request)
+        updated_invoice = await add_job_to_invoice(
+            description=payload.service.value,
+            qty=payload.Qty,
+            rate=payload.UnitPrice,
+            item_name=payload.service.value
+        )
+        
     except HTTPException:
         raise
 

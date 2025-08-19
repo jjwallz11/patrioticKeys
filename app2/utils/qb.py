@@ -179,7 +179,16 @@ async def clear_session_customer(session_id: str):
     key = f"{session_id}:qb_customer"
     await session_store.delete(key)
     
-    
+
+async def get_all_qb_items():
+    q = "select Id, Name from Item"
+    url = f"{QB_BASE}/{QB_REALM_ID}/query?query={httpx.QueryParams({'query': q})['query']}"
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        r = await client.get(url, headers=_auth_headers())
+    r.raise_for_status()
+    return r.json().get("QueryResponse", {}).get("Item", [])
+
+
 async def get_item_id_by_name(name: str) -> str:
     """
     Dynamically fetches the Item ID from QuickBooks by item name.
