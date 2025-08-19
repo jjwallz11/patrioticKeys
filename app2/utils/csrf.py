@@ -4,7 +4,7 @@ from fastapi import Request, HTTPException
 from urllib.parse import urlparse
 import os
 
-# Set this in Railway (Backend service): FRONTEND_ORIGIN=https://surfacecleanfront-production.up.railway.app
+# Set this in Railway (Backend service): FRONTEND_ORIGIN=https://surfacecleanfront-production.up.railway.app (except new PK origin)
 ALLOWED_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173").rstrip("/")
 
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}

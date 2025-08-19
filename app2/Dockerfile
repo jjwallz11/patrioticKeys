@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Install system deps first
 RUN apt-get update && \
-    apt-get install -y make gcc libpq-dev && \
+    apt-get install -y make gcc && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -15,6 +15,5 @@ COPY . .
 
 EXPOSE 8080
 
-# app/Dockerfile
 ENV PORT=8080
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
