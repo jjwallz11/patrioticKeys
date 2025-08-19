@@ -22,5 +22,6 @@ async def add_job_to_invoice(description: str, qty: float, rate: float, item_nam
         description=description,
         qty=qty,
         rate=rate,
+        item_id=item_id,
     )
     return result
