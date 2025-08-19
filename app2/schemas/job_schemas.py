@@ -6,8 +6,8 @@ from enum import Enum
 
 class ServiceType(str, Enum):
     smart_key = "Generate Smart Key"
-    high_security = "Generate High Security Transponder key"
-    transponder = "Generate Transponder key"
+    high_security = "Generate High Security Transponder Key"
+    transponder = "Generate Transponder Key"
 
 class JobBase(BaseModel):
     customer_id: Optional[str] = Field(None, description="QuickBooks customer Id (optional after first scan)")
