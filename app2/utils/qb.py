@@ -19,23 +19,28 @@ def _auth_headers():
     }
 
 
-async def search_customers(q: str = "", limit: int = 25) -> list[dict]:
+async def search_customers(
+    q: str, limit: int, access_token: str, realm_id: str
+) -> list[dict]:
     query = (
-        f"select * from Customer"
+        "select * from Customer"
         if not q else
         f"select * from Customer where DisplayName like '%{q}%'"
     )
-    url = f"{QB_BASE}/{QB_REALM_ID}/query?query={query}&limit={limit}"
-    client = httpx.AsyncClient()
+    url = f"https://quickbooks.api.intuit.com/v3/company/{realm_id}/query?query={query}&limit={limit}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/json"
+    }
 
-    try:
-        r = await client.get(url, headers=_auth_headers())
-        r.raise_for_status()
-        data = r.json()
-        return data.get("QueryResponse", {}).get("Customer", [])
-    except httpx.HTTPStatusError as e:
-        print("QuickBooks API error:", e.response.status_code, e.response.text)
-        return []
+    async with httpx.AsyncClient() as client:
+        try:
+            r = await client.get(url, headers=headers)
+            r.raise_for_status()
+            return r.json().get("QueryResponse", {}).get("Customer", [])
+        except httpx.HTTPStatusError as e:
+            print("QuickBooks API error:", e.response.status_code, e.response.text)
+            return []
 
 
 async def get_customer_by_id(customer_id: str):

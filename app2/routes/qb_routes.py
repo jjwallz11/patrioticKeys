@@ -1,6 +1,6 @@
 # app/routes/qb_routes.py
 
-from fastapi import APIRouter, Depends, Query, Body, Request
+from fastapi import APIRouter, Depends, Query, Body, Request, HTTPException
 from .auth_routes import get_current_user
 from utils.qb import (
     search_customers,
@@ -18,11 +18,18 @@ router = APIRouter()
 # Used internally by app to search for matching customers
 @router.get("/customers")
 async def list_customers(
+    request: Request,
     q: str = Query("", alias="query"),
     limit: int = Query(25, ge=1, le=100),
     _ = Depends(get_current_user),
 ):
-    return await search_customers(q, limit)
+    access_token = request.cookies.get("access_token")
+    realm_id = request.cookies.get("realm_id")
+
+    if not access_token or not realm_id:
+        raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
+
+    return await search_customers(q, limit, access_token, realm_id)
 
 # Create a new customer (if app doesn't find one)
 @router.post("/customers")
