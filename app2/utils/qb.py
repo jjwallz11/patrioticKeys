@@ -128,7 +128,7 @@ async def get_or_create_today_invoice(customer_id: str):
     return {"Id": inv.get("Id"), "DocNumber": inv.get("DocNumber")}
 
 
-async def append_invoice_line(invoice_id: str, description: str, qty: float, rate: float):
+async def append_invoice_line(invoice_id: str, description: str, qty: float, rate: float, item_id: str):
     """
     Adds a single SalesItem line to an existing invoice by sparse update.
     """
@@ -146,8 +146,7 @@ async def append_invoice_line(invoice_id: str, description: str, qty: float, rat
         "Description": description,
         "Amount": round(qty * rate, 2),
         "SalesItemLineDetail": {
-            # If you have a specific ItemRef in QB, set it here; else leave None
-            # "ItemRef": {"value": "1", "name": "Services"},
+            "ItemRef": {"value": item_id},
             "Qty": qty,
             "UnitPrice": rate
         }
