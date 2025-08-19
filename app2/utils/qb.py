@@ -28,7 +28,8 @@ async def search_customers(query: str = "", limit: int = 25):
         # name contains query (case-insensitive handled by QB)
         q += f" where DisplayName like '%{query}%'"
     q += f" startposition 1 maxresults {max(1, min(limit, 100))}"
-    url = f"{QB_BASE}/{QB_REALM_ID}/query?query={httpx.QueryParams({'query': q})['query']}"
+    params = httpx.QueryParams({"query": q})
+    url = f"{QB_BASE}/{QB_REALM_ID}/query?{params}"
     async with httpx.AsyncClient(timeout=20.0) as client:
         r = await client.get(url, headers=_auth_headers())
     r.raise_for_status()
