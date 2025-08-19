@@ -19,32 +19,23 @@ def _auth_headers():
     }
 
 
-async def search_customers(query: str = "", limit: int = 25):
-    """
-    Simple name search. If query is empty, returns first N customers.
-    """
-    q = f"select * from Customer"
-    if query:
-        # name contains query (case-insensitive handled by QB)
-        q += f" where DisplayName like '%{query}%'"
-    q += f" startposition 1 maxresults {max(1, min(limit, 100))}"
-    params = httpx.QueryParams({"query": q})
-    url = f"{QB_BASE}/{QB_REALM_ID}/query?{params}"
-    async with httpx.AsyncClient(timeout=20.0) as client:
+async def search_customers(q: str = "", limit: int = 25) -> list[dict]:
+    query = (
+        f"select * from Customer"
+        if not q else
+        f"select * from Customer where DisplayName like '%{q}%'"
+    )
+    url = f"{QB_BASE}/{QB_REALM_ID}/query?query={query}&limit={limit}"
+    client = httpx.AsyncClient()
+
+    try:
         r = await client.get(url, headers=_auth_headers())
-    r.raise_for_status()
-    data = r.json()
-    # Normalize to a simple list
-    customers = data.get("QueryResponse", {}).get("Customer", []) or []
-    return [
-        {
-            "id": c["Id"],
-            "display_name": c.get("DisplayName"),
-            "primary_email": (c.get("PrimaryEmailAddr") or {}).get("Address"),
-            "primary_phone": (c.get("PrimaryPhone") or {}).get("FreeFormNumber"),
-        }
-        for c in customers
-    ]
+        r.raise_for_status()
+        data = r.json()
+        return data.get("QueryResponse", {}).get("Customer", [])
+    except httpx.HTTPStatusError as e:
+        print("QuickBooks API error:", e.response.status_code, e.response.text)
+        return []
 
 
 async def get_customer_by_id(customer_id: str):
