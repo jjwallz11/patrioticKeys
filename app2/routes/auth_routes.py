@@ -7,8 +7,8 @@ from jose import JWTError
 from pydantic import BaseModel, EmailStr, field_validator
 import re
 from datetime import timedelta
-
 from config import settings
+
 from utils.tokens import (
     create_access_token,
     decode_access_token,
@@ -47,6 +47,7 @@ async def login(payload: LoginRequest):
     access_token = create_access_token({"sub": user["email"]}, expires_delta=token_expires)
     csrf_token = generate_csrf_token()
     secure_cookie = settings.ENVIRONMENT == "production"
+    realm_id = settings.QB_REALM_ID
 
     response = JSONResponse(content={
         "message": "Login successful",
@@ -70,6 +71,14 @@ async def login(payload: LoginRequest):
         key="csrf_token",
         value=csrf_token,
         httponly=False,
+        samesite="none",
+        secure=secure_cookie,
+        max_age=int(token_expires.total_seconds())
+    )
+    response.set_cookie(
+        key="realm_id",
+        value=realm_id,
+        httponly=True,
         samesite="none",
         secure=secure_cookie,
         max_age=int(token_expires.total_seconds())
@@ -111,6 +120,7 @@ async def logout():
     response = JSONResponse(content={"message": "Logout successful"})
     response.delete_cookie("access_token", httponly=True, samesite="none", secure=secure_cookie)
     response.delete_cookie("csrf_token", httponly=False, samesite="none", secure=secure_cookie)
+    response.delete_cookie("realm_id", httponly=True, samesite="none", secure=secure_cookie)
 
     return response
 
