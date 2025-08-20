@@ -9,9 +9,12 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # === Load .env file based on environment ===
-ENV = os.getenv("ENVIRONMENT", "development")
-ENV_FILE = BASE_DIR / f".env.{ENV}" if ENV != "development" else BASE_DIR / ".env"
-load_dotenv(dotenv_path=ENV_FILE)
+if os.getenv("RAILWAY_ENVIRONMENT"):
+    ENV = os.getenv("ENVIRONMENT", "production")
+else:
+    ENV = os.getenv("ENVIRONMENT", "development")
+    ENV_FILE = BASE_DIR / f".env.{ENV}" if ENV != "development" else BASE_DIR / ".env"
+    load_dotenv(dotenv_path=ENV_FILE)
 
 class Settings(BaseSettings):
     # === Server ===
