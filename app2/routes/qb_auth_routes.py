@@ -8,6 +8,7 @@ from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 import os
 import httpx
+import base64
 
 router = APIRouter()
 
@@ -47,10 +48,16 @@ async def qb_callback(request: Request):
         raise HTTPException(status_code=400, detail="Missing code or realmId in callback.")
 
     token_url = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
+    
+    client_id = os.getenv("QB_CLIENT_ID")
+    client_secret = os.getenv("QB_CLIENT_SECRET")
+    auth_bytes = f"{client_id}:{client_secret}".encode("utf-8")
+    auth_header = base64.b64encode(auth_bytes).decode("utf-8")
+    
     headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": "Basic " + httpx.Auth((os.getenv("QB_CLIENT_ID"), os.getenv("QB_CLIENT_SECRET"))).auth_header,
+    "Accept": "application/json",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Authorization": f"Basic {auth_header}",
     }
 
     body = {

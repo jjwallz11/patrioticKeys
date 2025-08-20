@@ -1,4 +1,4 @@
-# app/Dockerfile
+# app2/Dockerfile
 FROM python:3.12-slim-bookworm
 
 WORKDIR /app2
