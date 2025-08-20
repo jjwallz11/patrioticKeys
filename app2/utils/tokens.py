@@ -1,4 +1,4 @@
-# app/utils/tokens.py
+# app2/utils/tokens.py
 
 from itsdangerous import URLSafeTimedSerializer
 from config import settings

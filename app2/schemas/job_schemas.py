@@ -1,4 +1,4 @@
-# app/schemas/job_schemas.py
+# app2/schemas/job_schemas.py
 
 from pydantic import BaseModel, Field
 from typing import Optional

@@ -1,7 +1,7 @@
 # app/Dockerfile
 FROM python:3.12-slim-bookworm
 
-WORKDIR /app
+WORKDIR /app2
 
 # Install system deps first
 RUN apt-get update && \

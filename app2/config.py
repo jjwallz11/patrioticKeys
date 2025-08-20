@@ -1,4 +1,4 @@
-# app/config.py
+# app2/config.py
 
 from pydantic_settings import BaseSettings
 from pydantic import ConfigDict

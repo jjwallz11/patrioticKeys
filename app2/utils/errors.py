@@ -1,3 +1,5 @@
+# app2/utils/erros.py
+
 from fastapi import HTTPException
 
 class CustomError(HTTPException):

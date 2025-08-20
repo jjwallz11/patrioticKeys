@@ -1,4 +1,4 @@
-# app/routes/auth_routes.py
+# app2/routes/auth_routes.py
 
 from fastapi import APIRouter, HTTPException, status, Request, Depends
 from fastapi.responses import JSONResponse
