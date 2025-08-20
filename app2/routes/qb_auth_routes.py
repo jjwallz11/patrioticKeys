@@ -4,16 +4,16 @@ from fastapi import APIRouter, Request, HTTPException
 from starlette.responses import RedirectResponse
 import os
 import urllib.parse
-from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
-import os
 import httpx
 import base64
 
 router = APIRouter()
 
+
 @router.get("/connect-to-qb")
 async def connect_to_qb():
+    print("🔁 /connect-to-qb route was hit")
     client_id = os.getenv("QB_CLIENT_ID")
     redirect_uri = os.getenv("QB_REDIRECT_URI")
     environment = os.getenv("QB_ENVIRONMENT", "sandbox")
