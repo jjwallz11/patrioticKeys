@@ -1,0 +1,81 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(7, 36, 96, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  border: 2px solid #072460;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  padding: 24px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  font-family: sans-serif;
+}
+
+.modal-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #072460;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.modal-message {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.password-input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.confirm-btn,
+.cancel-btn {
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.confirm-btn {
+  background-color: #072460; /* Patriotic Blue */
+}
+
+.confirm-btn:hover {
+  background-color: #0A3161; /* Old Glory Blue */
+}
+
+.cancel-btn {
+  background-color: #AE2335; /* Patriotic Red */
+}
+
+.cancel-btn:hover {
+  background-color: #B31942; /* Old Glory Red */
+}

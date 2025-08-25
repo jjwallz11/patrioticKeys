@@ -7,7 +7,8 @@ from utils.qb import (
     create_customer,
     clear_session_customer,
     get_or_create_today_invoice,
-    get_all_qb_items
+    get_all_qb_items,
+    send_invoice_email
 )
 from utils.session import get_session_id, set_current_qb_customer
 from utils.csrf import verify_csrf
@@ -34,10 +35,17 @@ async def list_customers(
 # Create a new customer (if app doesn't find one)
 @router.post("/customers")
 async def create_new_customer(
+    request: Request,
     payload: dict = Body(...),
     _ = Depends(get_current_user),
 ):
-    return await create_customer(payload)
+    access_token = request.cookies.get("access_token")
+    realm_id = request.cookies.get("realm_id")
+
+    if not access_token or not realm_id:
+        raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
+
+    return await create_customer(payload, access_token, realm_id)
 
 # Get or create today's invoice and set session customer
 @router.post("/customers/{customer_id}/invoices/today")
@@ -84,3 +92,22 @@ async def reset_customer(
     session_id = get_session_id(request)
     await clear_session_customer(session_id)
     return {"message": "Customer reset successful"}
+
+
+@router.post("/invoices/send")
+async def send_invoice_to_customer(request: Request, _=Depends(get_current_user)):
+    verify_csrf(request)
+    session_id = request.cookies.get("session_id")
+    access_token = request.cookies.get("access_token")
+    realm_id = request.cookies.get("realm_id")
+
+    if not all([session_id, access_token, realm_id]):
+        raise HTTPException(status_code=401, detail="Missing authentication context.")
+
+    customer = await get_session_customer(session_id)
+    if not customer:
+        raise HTTPException(status_code=400, detail="No active QuickBooks customer.")
+
+    invoice = await get_or_create_today_invoice(customer["id"], access_token, realm_id)
+    await send_invoice_email(invoice["Id"], access_token, realm_id)
+    return {"message": f"Invoice {invoice['DocNumber']} sent to customer {customer['display_name']}"}

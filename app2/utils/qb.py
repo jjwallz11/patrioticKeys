@@ -131,6 +131,14 @@ async def append_invoice_line(invoice_id: str, description: str, qty: float, rat
     return {"Id": updated.get("Id"), "DocNumber": updated.get("DocNumber")}
 
 
+async def send_invoice_email(invoice_id: str, access_token: str, realm_id: str):
+    url = f"{QB_BASE}/{realm_id}/invoice/{invoice_id}/send"
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        r = await client.post(url, headers=build_qb_headers(access_token))
+    r.raise_for_status()
+    return r.json()
+
+
 async def get_session_customer(session_id: str):
     key = f"{session_id}:qb_customer"
     return await session_store.get(key)
