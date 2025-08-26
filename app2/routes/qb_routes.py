@@ -7,10 +7,9 @@ from utils.qb import (
     create_customer,
     clear_session_customer,
     get_or_create_today_invoice,
-    get_all_qb_items,
     send_invoice_email
 )
-from utils.session import get_session_id, set_current_qb_customer
+from utils.session import get_session_id, set_current_qb_customer, get_current_qb_customer
 from utils.csrf import verify_csrf
 from services import add_job_to_invoice
 
@@ -102,22 +101,21 @@ async def send_invoice_to_customer(
     _ = Depends(get_current_user),
 ):
     verify_csrf(request)
-    session_id = request.cookies.get("session_id")
     access_token = request.cookies.get("access_token")
     realm_id = request.cookies.get("realm_id")
 
-    if not all([session_id, access_token, realm_id]):
+    if not all([access_token, realm_id]):
         raise HTTPException(status_code=401, detail="Missing authentication context.")
 
-    customer = await get_session_customer(request)
-    if not customer or not customer.get("customer_id"):
+    customer_id = get_current_qb_customer(request)
+    if not customer_id:
         raise HTTPException(status_code=400, detail="No active QuickBooks customer.")
 
-    invoice = await get_or_create_today_invoice(customer["customer_id"], access_token, realm_id)
+    invoice = await get_or_create_today_invoice(customer_id, access_token, realm_id)
     await send_invoice_email(invoice["Id"], access_token, realm_id)
 
     return {
-        "message": f"Invoice {invoice['DocNumber']} sent to customer {customer['customer_id']}"
+        "message": f"Invoice {invoice['DocNumber']} sent to customer {customer_id}"
     }
 
 # Get current invoice for stored session customer
