@@ -110,7 +110,7 @@ async def qb_callback(request: Request):
         raise HTTPException(status_code=500, detail=f"Token exchange failed: {response.text}")
 
     token_data = response.json()
-    qb_access_token = token_data.get("qb_access_token")
+    qb_access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
 
     response_redirect = RedirectResponse(url="/")
