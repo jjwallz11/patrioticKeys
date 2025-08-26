@@ -1,18 +1,16 @@
-// front11/src/utils/csrf.ts
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+function getCsrfToken(): string | null {
+  const match = document.cookie.match(/(?:^|; )csrf_token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
 
 const csrfFetch = async (
   url: string,
   options: RequestInit = {}
 ): Promise<Response> => {
-  const tokenRes = await fetch(`${API_BASE_URL}/api/csrf/token`, {
-    credentials: "include",
-  });
-  if (!tokenRes.ok) throw new Error("Failed to fetch CSRF token");
-
-  const data = await tokenRes.json();
-  const csrfToken = data.csrfToken;
+  const csrfToken = getCsrfToken();
+  if (!csrfToken) throw new Error("CSRF token not found in cookies");
 
   const headers: HeadersInit = {
     "Content-Type": "application/json",
