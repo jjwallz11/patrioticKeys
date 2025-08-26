@@ -2,6 +2,7 @@
 
 import httpx
 from datetime import date
+from urllib.parse import quote
 from utils.session import session_store
 
 QB_BASE = "https://quickbooks.api.intuit.com/v3/company"
@@ -16,10 +17,11 @@ def build_qb_headers(access_token: str) -> dict:
 
 
 async def search_customers(q: str, limit: int, access_token: str, realm_id: str) -> list[dict]:
+    escaped_q = quote(q)
     query = (
         "select * from Customer"
         if not q else
-        f"select * from Customer where DisplayName like '%{q}%'"
+        f"select * from Customer where DisplayName like '%{escaped_q}%'"
     )
     url = f"{QB_BASE}/{realm_id}/query?query={query}&limit={limit}"
     async with httpx.AsyncClient() as client:
@@ -51,11 +53,9 @@ async def create_customer(payload: dict, access_token: str, realm_id: str):
     body = {
         "DisplayName": payload.get("DisplayName"),
     }
-    email = payload.get("PrimaryEmailAddr")
-    phone = payload.get("PrimaryPhone")
-    if email:
+    if email := payload.get("PrimaryEmailAddr"):
         body["PrimaryEmailAddr"] = {"Address": email}
-    if phone:
+    if phone := payload.get("PrimaryPhone"):
         body["PrimaryPhone"] = {"FreeFormNumber": phone}
 
     async with httpx.AsyncClient(timeout=20.0) as client:
@@ -77,7 +77,7 @@ async def get_or_create_today_invoice(customer_id: str, access_token: str, realm
         f"where CustomerRef = '{customer_id}' and TxnDate = '{today}' and PrivateNote != 'CLOSED' "
         "order by MetaData.CreateTime desc"
     )
-    query_url = f"{QB_BASE}/{realm_id}/query?query={q}"
+    query_url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
     async with httpx.AsyncClient(timeout=20.0) as client:
         r = await client.get(query_url, headers=build_qb_headers(access_token))
     r.raise_for_status()
@@ -90,7 +90,7 @@ async def get_or_create_today_invoice(customer_id: str, access_token: str, realm
         r.raise_for_status()
         return r.json().get("Invoice", {})
 
-    # Create a new invoice if none found
+    # Create new invoice
     create_url = f"{QB_BASE}/{realm_id}/invoice"
     payload = {
         "Line": [],
@@ -156,7 +156,7 @@ async def clear_session_customer(session_id: str):
 
 async def get_all_qb_items(access_token: str, realm_id: str):
     q = "select Id, Name from Item"
-    url = f"{QB_BASE}/{realm_id}/query?query={q}"
+    url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
     async with httpx.AsyncClient(timeout=20.0) as client:
         r = await client.get(url, headers=build_qb_headers(access_token))
     r.raise_for_status()
@@ -165,7 +165,7 @@ async def get_all_qb_items(access_token: str, realm_id: str):
 
 async def get_item_id_by_name(name: str, access_token: str, realm_id: str) -> str:
     q = f"select Id, Name from Item where Name = '{name}'"
-    url = f"{QB_BASE}/{realm_id}/query?query={q}"
+    url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
     async with httpx.AsyncClient(timeout=20.0) as client:
         r = await client.get(url, headers=build_qb_headers(access_token))
     r.raise_for_status()
