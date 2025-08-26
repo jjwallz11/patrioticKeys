@@ -71,7 +71,7 @@ async def login(payload: LoginRequest):
     })
 
     response.set_cookie(
-        key="access_token",
+        key="qb_access_token",
         value=qb_access_token,
         httponly=True,
         samesite="none",
