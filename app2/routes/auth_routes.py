@@ -60,7 +60,7 @@ async def login(payload: LoginRequest):
     })
 
     response.set_cookie(
-        key="access_token",
+        key="qb_access_token",
         value=access_token,
         httponly=True,
         samesite="none",
@@ -76,7 +76,7 @@ async def login(payload: LoginRequest):
         max_age=int(token_expires.total_seconds())
     )
     response.set_cookie(
-        key="realm_id",
+        key="qb_realm_id",
         value=realm_id,
         httponly=True,
         samesite="none",
@@ -88,7 +88,7 @@ async def login(payload: LoginRequest):
 
 
 async def get_current_user(request: Request):
-    token = request.cookies.get("access_token")
+    token = request.cookies.get("qb_access_token")
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
 
@@ -118,9 +118,9 @@ async def logout():
     secure_cookie = settings.ENVIRONMENT == "production"
 
     response = JSONResponse(content={"message": "Logout successful"})
-    response.delete_cookie("access_token", httponly=True, samesite="none", secure=secure_cookie)
+    response.delete_cookie("qb_access_token", httponly=True, samesite="none", secure=secure_cookie)
     response.delete_cookie("csrf_token", httponly=False, samesite="none", secure=secure_cookie)
-    response.delete_cookie("realm_id", httponly=True, samesite="none", secure=secure_cookie)
+    response.delete_cookie("qb_realm_id", httponly=True, samesite="none", secure=secure_cookie)
 
     return response
 
