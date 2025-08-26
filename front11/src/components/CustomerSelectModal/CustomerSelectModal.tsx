@@ -31,7 +31,7 @@ const CustomerSelectModal = ({
         const res = await csrfFetch("/api/qb/customers", { credentials: "include" });
         if (!res.ok) throw new Error("Failed to load customers");
         const data = await res.json();
-        setCustomers(data.customers || []);
+        setCustomers(data || []);
       } catch (err: any) {
         setError(err.message || "Error loading customers");
       } finally {
