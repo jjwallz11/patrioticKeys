@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import BaseModal from "../BaseModal/BaseModal";
 import AddCustomerModal from "../AddCustomerModal/AddCustomerModal";
+import csrfFetch from "../../utils/csrf";
 
 interface Customer {
   id: string;
@@ -27,7 +28,7 @@ const CustomerSelectModal = ({
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await fetch("/api/customers", { credentials: "include" });
+        const res = await csrfFetch("/api/customers", { credentials: "include" });
         if (!res.ok) throw new Error("Failed to load customers");
         const data = await res.json();
         setCustomers(data.customers || []);

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import BaseModal from "../BaseModal/BaseModal";
+import csrfFetch from "../../utils/csrf";
 
 interface ChangePasswordModalProps {
   onClose: () => void;
@@ -19,7 +20,7 @@ const ChangePasswordModal = ({ onClose }: ChangePasswordModalProps) => {
     setSubmitting(true);
 
     try {
-      const res = await fetch("/api/session/change-password", {
+      const res = await csrfFetch("/api/session/change-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

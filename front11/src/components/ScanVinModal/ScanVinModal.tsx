@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import Tesseract from "tesseract.js";
 import { VehicleResponse } from "../../types";
+import csrfFetch from "../../utils/csrf";
 
 type ScanVinModalProps = {
   onClose: () => void;
@@ -66,14 +67,14 @@ const ScanVinModal = ({
       setVin(extractedVin || "No VIN found");
 
       if (extractedVin) {
-        const res = await fetch(`/api/vehicle/${extractedVin}`);
+        const res = await csrfFetch(`/api/vehicle/${extractedVin}`);
         const result: VehicleResponse = await res.json();
         const lastSix = extractedVin.slice(-6);
         setLastSix(lastSix);
 
         const enrichedResult = { ...result, lastSix };
         setVinResult(enrichedResult);
-        
+
         openResultsModal();
       }
     } catch (err) {

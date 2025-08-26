@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import CompleteInvoiceButton from "../../components/CompleteInvoiceButton";
+import csrfFetch from "../../utils/csrf";
 
 type InvoiceLine = {
   Id: string;
@@ -25,7 +26,7 @@ export default function InvoicePage() {
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
-        const res = await fetch("/api/qb/invoice", {
+        const res = await csrfFetch("/api/qb/invoice", {
           credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to load invoice");

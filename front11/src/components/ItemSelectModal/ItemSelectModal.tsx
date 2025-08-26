@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import BaseModal from "../BaseModal/BaseModal";
+import csrfFetch from "../../utils/csrf";
 
 interface QBItem {
   id: string;
@@ -22,7 +23,7 @@ const ItemSelectModal = ({ onClose, onItemSelect }: ItemSelectModalProps) => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const res = await fetch("/api/qb/items", { credentials: "include" });
+        const res = await csrfFetch("/api/qb/items", { credentials: "include" });
         if (!res.ok) throw new Error("Failed to load items");
         const data = await res.json();
         setItems(data.items || []);
