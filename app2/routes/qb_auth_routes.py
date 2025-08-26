@@ -40,15 +40,15 @@ async def refresh_qb_access_token():
         raise HTTPException(status_code=500, detail=f"Refresh failed: {response.text}")
 
     token_data = response.json()
-    new_access_token = token_data["access_token"]
+    new_qb_access_token = token_data["access_token"]
     new_refresh_token = token_data["refresh_token"]
 
     # Optional: Log or store these securely
-    print("🆕 ACCESS TOKEN:", new_access_token)
+    print("🆕 ACCESS TOKEN:", new_qb_access_token)
     print("🆕 REFRESH TOKEN:", new_refresh_token)
 
     return {
-        "access_token": new_access_token,
+        "access_token": new_qb_access_token,
         "refresh_token": new_refresh_token
     }
     
@@ -110,12 +110,12 @@ async def qb_callback(request: Request):
         raise HTTPException(status_code=500, detail=f"Token exchange failed: {response.text}")
 
     token_data = response.json()
-    access_token = token_data.get("access_token")
+    qb_access_token = token_data.get("qb_access_token")
     refresh_token = token_data.get("refresh_token")
 
     response_redirect = RedirectResponse(url="/")
 
-    response_redirect.set_cookie("qb_access_token", access_token, httponly=True)
+    response_redirect.set_cookie("qb_access_token", qb_access_token, httponly=True)
     response_redirect.set_cookie("qb_refresh_token", refresh_token, httponly=True)
     response_redirect.set_cookie("qb_realm_id", realm_id, httponly=True)
 

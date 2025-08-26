@@ -21,24 +21,24 @@ router = APIRouter()
 # List or search customers
 @router.get("/customers")
 async def list_customers(request: Request):
-    access_token = request.cookies.get("access_token")
+    qb_access_token = request.cookies.get("qb_access_token")
     realm_id = request.cookies.get("realm_id")
 
-    if not access_token or not realm_id:
+    if not qb_access_token or not realm_id:
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
 
-    return await search_customers(access_token, realm_id)
+    return await search_customers(qb_access_token, realm_id)
 
 # Create a new customer
 @router.post("/customers")
 async def create_new_customer(request: Request):
-    access_token = request.cookies.get("access_token")
+    qb_access_token = request.cookies.get("qb_access_token")
     realm_id = request.cookies.get("realm_id")
 
-    if not access_token or not realm_id:
+    if not qb_access_token or not realm_id:
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
 
-    return await create_customer(access_token, realm_id)
+    return await create_customer(qb_access_token, realm_id)
 
 # Create or fetch today's invoice, and store selected customer
 @router.post("/customers/{customer_id}/invoices/today")
@@ -46,13 +46,13 @@ async def get_or_create_invoice_today(customer_id: str, request: Request):
     verify_csrf(request)
     set_current_qb_customer(customer_id, request)
 
-    access_token = request.cookies.get("access_token")
+    qb_access_token = request.cookies.get("qb_access_token")
     realm_id = request.cookies.get("realm_id")
 
-    if not access_token or not realm_id:
+    if not qb_access_token or not realm_id:
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
 
-    return await get_or_create_today_invoice(customer_id, access_token, realm_id)
+    return await get_or_create_today_invoice(customer_id, qb_access_token, realm_id)
 
 # Add job line item to current invoice
 @router.post("/invoices/items")
@@ -82,18 +82,18 @@ async def reset_customer(request: Request):
 @router.post("/invoices/send")
 async def send_invoice_to_customer(request: Request):
     verify_csrf(request)
-    access_token = request.cookies.get("access_token")
+    qb_access_token = request.cookies.get("qb_access_token")
     realm_id = request.cookies.get("realm_id")
 
-    if not all([access_token, realm_id]):
+    if not all([qb_access_token, realm_id]):
         raise HTTPException(status_code=401, detail="Missing authentication context.")
 
     customer_id = get_current_qb_customer(request)
     if not customer_id:
         raise HTTPException(status_code=400, detail="No active QuickBooks customer.")
 
-    invoice = await get_or_create_today_invoice(customer_id, access_token, realm_id)
-    await send_invoice_email(invoice["Id"], access_token, realm_id)
+    invoice = await get_or_create_today_invoice(customer_id, qb_access_token, realm_id)
+    await send_invoice_email(invoice["Id"], qb_access_token, realm_id)
 
     return {
         "message": f"Invoice {invoice['DocNumber']} sent to customer {customer_id}"
@@ -103,14 +103,14 @@ async def send_invoice_to_customer(request: Request):
 @router.get("/invoice")
 async def get_today_invoice(request: Request):
     session_id = get_session_id(request)
-    access_token = request.cookies.get("access_token")
+    qb_access_token = request.cookies.get("qb_access_token")
     realm_id = request.cookies.get("realm_id")
 
-    if not all([session_id, access_token, realm_id]):
+    if not all([session_id, qb_access_token, realm_id]):
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
 
     customer_id = get_current_qb_customer(request)
     if not customer_id:
         raise HTTPException(status_code=400, detail="No active customer found in session")
 
-    return await get_or_create_today_invoice(customer_id, access_token, realm_id)
+    return await get_or_create_today_invoice(customer_id, qb_access_token, realm_id)

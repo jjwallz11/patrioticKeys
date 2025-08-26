@@ -12,9 +12,9 @@ from fastapi import Request
 QB_BASE = "https://quickbooks.api.intuit.com/v3/company"
 
 
-def build_qb_headers(access_token: str) -> dict:
+def build_qb_headers(qb_access_token: str) -> dict:
     return {
-        "Authorization": f"Bearer {access_token}",
+        "Authorization": f"Bearer {qb_access_token}",
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
@@ -51,21 +51,21 @@ async def refresh_qb_tokens() -> tuple[str, str]:
         raise HTTPException(status_code=500, detail=f"QuickBooks refresh failed: {response.text}")
 
     token_data = response.json()
-    return token_data["access_token"], token_data["refresh_token"]
+    return token_data["qb_access_token"], token_data["refresh_token"]
 
 
-async def search_customers(access_token: str, realm_id: str) -> list[dict]:
+async def search_customers(qb_access_token: str, realm_id: str) -> list[dict]:
     query = "select * from Customer"
     url = f"{QB_BASE}/{realm_id}/query?query={query}"
     
     print("Calling QuickBooks API:", url)
-    print("🔸 FULL ACCESS TOKEN:", access_token)
+    print("🔸 FULL ACCESS TOKEN:", qb_access_token)
     print("Realm ID:", realm_id)
     print("Query:", query)
     
     async with httpx.AsyncClient() as client:
         try:
-            r = await client.get(url, headers=build_qb_headers(access_token))
+            r = await client.get(url, headers=build_qb_headers(qb_access_token))
             r.raise_for_status()
             json_resp = r.json()
             print("QuickBooks response:", r.json())
@@ -76,10 +76,10 @@ async def search_customers(access_token: str, realm_id: str) -> list[dict]:
             return []
 
 
-async def get_customer_by_id(customer_id: str, access_token: str, realm_id: str):
+async def get_customer_by_id(customer_id: str, qb_access_token: str, realm_id: str):
     url = f"{QB_BASE}/{realm_id}/customer/{customer_id}"
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.get(url, headers=build_qb_headers(access_token))
+        r = await client.get(url, headers=build_qb_headers(qb_access_token))
     r.raise_for_status()
     c = r.json().get("Customer", {})
     return {
@@ -90,7 +90,7 @@ async def get_customer_by_id(customer_id: str, access_token: str, realm_id: str)
     }
 
 
-async def create_customer(payload: dict, access_token: str, realm_id: str):
+async def create_customer(payload: dict, qb_access_token: str, realm_id: str):
     url = f"{QB_BASE}/{realm_id}/customer"
     body = {
         "DisplayName": payload.get("DisplayName"),
@@ -101,7 +101,7 @@ async def create_customer(payload: dict, access_token: str, realm_id: str):
         body["PrimaryPhone"] = {"FreeFormNumber": phone}
 
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.post(url, headers=build_qb_headers(access_token), json=body)
+        r = await client.post(url, headers=build_qb_headers(qb_access_token), json=body)
     r.raise_for_status()
     c = r.json().get("Customer", {})
     return {
@@ -112,7 +112,7 @@ async def create_customer(payload: dict, access_token: str, realm_id: str):
     }
 
 
-async def get_or_create_today_invoice(customer_id: str, access_token: str, realm_id: str):
+async def get_or_create_today_invoice(customer_id: str, qb_access_token: str, realm_id: str):
     today = date.today().isoformat()
     q = (
         "select Id, DocNumber, TxnDate, TotalAmt, Balance from Invoice "
@@ -121,14 +121,14 @@ async def get_or_create_today_invoice(customer_id: str, access_token: str, realm
     )
     query_url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.get(query_url, headers=build_qb_headers(access_token))
+        r = await client.get(query_url, headers=build_qb_headers(qb_access_token))
     r.raise_for_status()
     invoices = r.json().get("QueryResponse", {}).get("Invoice", []) or []
     if invoices:
         invoice_id = invoices[0]["Id"]
         get_url = f"{QB_BASE}/{realm_id}/invoice/{invoice_id}"
         async with httpx.AsyncClient(timeout=20.0) as client:
-            r = await client.get(get_url, headers=build_qb_headers(access_token))
+            r = await client.get(get_url, headers=build_qb_headers(qb_access_token))
         r.raise_for_status()
         return r.json().get("Invoice", {})
 
@@ -140,16 +140,16 @@ async def get_or_create_today_invoice(customer_id: str, access_token: str, realm
         "TxnDate": today,
     }
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.post(create_url, headers=build_qb_headers(access_token), json=payload)
+        r = await client.post(create_url, headers=build_qb_headers(qb_access_token), json=payload)
     r.raise_for_status()
     inv = r.json().get("Invoice", {})
     return {"Id": inv.get("Id"), "DocNumber": inv.get("DocNumber")}
 
 
-async def append_invoice_line(invoice_id: str, description: str, qty: float, rate: float, item_id: str, access_token: str, realm_id: str):
+async def append_invoice_line(invoice_id: str, description: str, qty: float, rate: float, item_id: str, qb_access_token: str, realm_id: str):
     get_url = f"{QB_BASE}/{realm_id}/invoice/{invoice_id}"
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.get(get_url, headers=build_qb_headers(access_token))
+        r = await client.get(get_url, headers=build_qb_headers(qb_access_token))
     r.raise_for_status()
     inv = r.json().get("Invoice", {})
     sync_token = inv.get("SyncToken", "0")
@@ -172,35 +172,35 @@ async def append_invoice_line(invoice_id: str, description: str, qty: float, rat
         "sparse": True
     }
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.post(update_url, headers=build_qb_headers(access_token), json=payload)
+        r = await client.post(update_url, headers=build_qb_headers(qb_access_token), json=payload)
     r.raise_for_status()
     updated = r.json().get("Invoice", {})
     return {"Id": updated.get("Id"), "DocNumber": updated.get("DocNumber")}
 
 
-async def send_invoice_email(invoice_id: str, access_token: str, realm_id: str):
+async def send_invoice_email(invoice_id: str, qb_access_token: str, realm_id: str):
     url = f"{QB_BASE}/{realm_id}/invoice/{invoice_id}/send"
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.post(url, headers=build_qb_headers(access_token))
+        r = await client.post(url, headers=build_qb_headers(qb_access_token))
     r.raise_for_status()
     return r.json()
 
 
-async def get_all_qb_items(access_token: str, realm_id: str):
+async def get_all_qb_items(qb_access_token: str, realm_id: str):
     q = "select Id, Name from Item"
     url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.get(url, headers=build_qb_headers(access_token))
+        r = await client.get(url, headers=build_qb_headers(qb_access_token))
     r.raise_for_status()
     return r.json().get("QueryResponse", {}).get("Item", [])
 
 
 async def get_item_id_by_name(name: str, request: Request) -> str:
-    access_token, realm_id = get_tokens_and_realm_id(request)
+    qb_access_token, realm_id = get_tokens_and_realm_id(request)
     q = f"select Id, Name from Item where Name = '{name}'"
     url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.get(url, headers=build_qb_headers(access_token))
+        r = await client.get(url, headers=build_qb_headers(qb_access_token))
     r.raise_for_status()
     items = r.json().get("QueryResponse", {}).get("Item", [])
     if not items:
