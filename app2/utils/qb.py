@@ -51,7 +51,7 @@ async def refresh_qb_tokens() -> tuple[str, str]:
         raise HTTPException(status_code=500, detail=f"QuickBooks refresh failed: {response.text}")
 
     token_data = response.json()
-    return token_data["qb_access_token"], token_data["refresh_token"]
+    return token_data["access_token"], token_data["refresh_token"]
 
 
 async def search_customers(qb_access_token: str, realm_id: str) -> list[dict]:
