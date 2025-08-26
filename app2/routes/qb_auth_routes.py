@@ -8,6 +8,51 @@ import base64
 router = APIRouter()
 
 
+@router.get("/refresh-token")
+async def refresh_qb_access_token():
+    refresh_token = os.getenv("QB_REFRESH_TOKEN")
+    client_id = os.getenv("QB_CLIENT_ID")
+    client_secret = os.getenv("QB_CLIENT_SECRET")
+
+    if not refresh_token or not client_id or not client_secret:
+        raise HTTPException(status_code=400, detail="Missing refresh token or credentials")
+
+    auth = f"{client_id}:{client_secret}".encode()
+    headers = {
+        "Authorization": f"Basic {base64.b64encode(auth).decode()}",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+    }
+
+    data = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer",
+            headers=headers,
+            data=data,
+        )
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail=f"Refresh failed: {response.text}")
+
+    token_data = response.json()
+    new_access_token = token_data["access_token"]
+    new_refresh_token = token_data["refresh_token"]
+
+    # Optional: Log or store these securely
+    print("🆕 ACCESS TOKEN:", new_access_token)
+    print("🆕 REFRESH TOKEN:", new_refresh_token)
+
+    return {
+        "access_token": new_access_token,
+        "refresh_token": new_refresh_token
+    }
+    
+    
 @router.get("/connect-to-qb")
 async def connect_to_qb():
     print("🔁 /connect-to-qb route was hit")
