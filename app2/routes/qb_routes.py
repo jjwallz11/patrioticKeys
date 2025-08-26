@@ -5,11 +5,10 @@ from .auth_routes import get_current_user
 from utils.qb import (
     search_customers,
     create_customer,
-    clear_session_customer,
     get_or_create_today_invoice,
     send_invoice_email
 )
-from utils.session import get_session_id, set_current_qb_customer, get_current_qb_customer
+from utils.session import get_session_id, set_current_qb_customer, get_current_qb_customer, reset_qb_customer
 from utils.csrf import verify_csrf
 from services import add_job_to_invoice
 
@@ -91,7 +90,7 @@ async def reset_customer(
 ):
     verify_csrf(request)
     session_id = get_session_id(request)
-    await clear_session_customer(session_id)
+    await reset_qb_customer(session_id)
     return {"message": "Customer reset successful"}
 
 # Send invoice to stored customer
