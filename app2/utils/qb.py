@@ -1,7 +1,7 @@
 import httpx
 from datetime import date
 from urllib.parse import quote
-from utils.session import session_store, get_tokens_and_realm_id
+from utils.session import get_tokens_and_realm_id
 
 QB_BASE = "https://quickbooks.api.intuit.com/v3/company"
 
@@ -144,16 +144,6 @@ async def send_invoice_email(invoice_id: str, access_token: str, realm_id: str):
         r = await client.post(url, headers=build_qb_headers(access_token))
     r.raise_for_status()
     return r.json()
-
-
-async def get_session_customer(session_id: str):
-    key = f"{session_id}:qb_customer"
-    return await session_store.get(key)
-
-
-async def clear_session_customer(session_id: str):
-    key = f"{session_id}:qb_customer"
-    await session_store.delete(key)
 
 
 async def get_all_qb_items(access_token: str, realm_id: str):
