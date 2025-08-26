@@ -44,11 +44,6 @@ async def login(payload: LoginRequest):
     if payload.email != user["email"] or payload.password != user["password"]:
         raise HTTPException(status_code=400, detail="Invalid credentials.")
 
-    try:
-        qb_access_token, _ = await refresh_qb_tokens()
-    except HTTPException:
-        raise HTTPException(status_code=502, detail="QuickBooks token refresh failed")
-
     token_expires = timedelta(hours=1)
     csrf_token = generate_csrf_token()
     secure_cookie = settings.ENVIRONMENT == "production"
@@ -70,9 +65,11 @@ async def login(payload: LoginRequest):
         }
     })
 
+    access_token = create_access_token(data={"sub": user["email"]})
+    
     response.set_cookie(
-        key="qb_access_token",
-        value=qb_access_token,
+        key="jwt_token",
+        value=access_token,
         httponly=True,
         samesite="none",
         secure=secure_cookie,
@@ -99,7 +96,7 @@ async def login(payload: LoginRequest):
 
 
 async def get_current_user(request: Request):
-    token = request.cookies.get("qb_access_token")
+    token = request.cookies.get("jwt_token")
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
 
