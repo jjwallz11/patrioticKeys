@@ -1,14 +1,27 @@
 # app2/utils/session.py
 
+from fastapi import Request
+
 # In-memory session store (non-persistent)
-# Example: {"abc123:qb_customer": "456"}
+# Example: {"abc123:qb_customer": "456", "xyz789:qb_customer": "789"}
 session_store: dict[str, str] = {}
 
-def get_current_qb_customer(session_id: str, access_token: str, realm_id: str) -> str | None:
-    return session_store.get(f"{session_id}:qb_customer")
+def get_session_id(request: Request) -> str:
+    return request.cookies.get("session_id") or request.headers.get("X-Session-Id", "")
 
-def set_current_qb_customer(customer_id: str, session_id: str, access_token: str, realm_id: str):
+def set_current_qb_customer(customer_id: str, request: Request):
+    session_id = get_session_id(request)
     session_store[f"{session_id}:qb_customer"] = customer_id
 
-def reset_qb_customer(session_id: str):
+def get_current_qb_customer(request: Request) -> str | None:
+    session_id = get_session_id(request)
+    return session_store.get(f"{session_id}:qb_customer")
+
+def reset_qb_customer(request: Request):
+    session_id = get_session_id(request)
     session_store.pop(f"{session_id}:qb_customer", None)
+    
+def get_tokens_and_realm_id(request: Request) -> tuple[str, str]:
+    access_token = request.cookies.get("access_token") or ""
+    realm_id = request.cookies.get("realm_id") or ""
+    return access_token, realm_id
