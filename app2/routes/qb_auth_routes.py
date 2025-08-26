@@ -1,5 +1,3 @@
-# app2/routes/qb_auth_routes.py
-
 from fastapi import APIRouter, Request, HTTPException
 from starlette.responses import RedirectResponse
 import os
@@ -66,19 +64,19 @@ async def qb_callback(request: Request):
     }
 
     async with httpx.AsyncClient() as client:
-        r = await client.post(token_url, data=body, headers=headers)
+        response = await client.post(token_url, data=body, headers=headers)
 
-    if r.status_code != 200:
-        raise HTTPException(status_code=500, detail=f"Token exchange failed: {r.text}")
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail=f"Token exchange failed: {response.text}")
 
-    token_data = r.json()
+    token_data = response.json()
     access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
 
-    response = RedirectResponse(url="/")
+    response_redirect = RedirectResponse(url="/")
 
-    response.set_cookie("qb_access_token", access_token, httponly=True)
-    response.set_cookie("qb_refresh_token", refresh_token, httponly=True)
-    response.set_cookie("qb_realm_id", realm_id, httponly=True)
+    response_redirect.set_cookie("qb_access_token", access_token, httponly=True)
+    response_redirect.set_cookie("qb_refresh_token", refresh_token, httponly=True)
+    response_redirect.set_cookie("qb_realm_id", realm_id, httponly=True)
 
-    return response
+    return response_redirect
