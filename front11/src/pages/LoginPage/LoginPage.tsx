@@ -12,13 +12,6 @@ const LoginPage: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
 
-  const getCSRFToken = (): string | null => {
-    const cookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("csrf_token="));
-    return cookie ? decodeURIComponent(cookie.split("=")[1]) : null;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -26,11 +19,6 @@ const LoginPage: React.FC = () => {
     try {
       const res = await csrfFetch("/api/session/login", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": getCSRFToken() || "",
-        },
         body: JSON.stringify({ email, password, remember_me: rememberMe }),
       });
 
@@ -50,7 +38,7 @@ const LoginPage: React.FC = () => {
       <form onSubmit={handleSubmit} className="login-form">
         {error && <p className="error">{error}</p>}
         <label>
-          Email: 
+          Email:
           <input
             type="email"
             value={email}
@@ -60,7 +48,7 @@ const LoginPage: React.FC = () => {
           />
         </label>
         <label>
-          Password: 
+          Password:
           <input
             type="password"
             value={password}
