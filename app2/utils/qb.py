@@ -157,7 +157,7 @@ async def get_all_qb_items(access_token: str, realm_id: str):
 
 
 async def get_item_id_by_name(name: str, request: Request) -> str:
-    access_token, realm_id = get_tokens_and_realm_id()
+    access_token, realm_id = get_tokens_and_realm_id(request)
     q = f"select Id, Name from Item where Name = '{name}'"
     url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
     async with httpx.AsyncClient(timeout=20.0) as client:

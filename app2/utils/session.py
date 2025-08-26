@@ -22,6 +22,6 @@ def reset_qb_customer(request: Request):
     session_store.pop(f"{session_id}:qb_customer", None)
     
 def get_tokens_and_realm_id(request: Request) -> tuple[str, str]:
-    access_token = request.cookies.get("access_token") or ""
-    realm_id = request.cookies.get("realm_id") or ""
+    access_token = request.cookies.get("qb_access_token") or ""
+    realm_id = request.cookies.get("qb_realm_id") or ""
     return access_token, realm_id

@@ -13,7 +13,7 @@ router = APIRouter()
 async def locksmith_job(payload: JobCreate, request: Request):
     verify_csrf(request)
 
-    customer_id = await get_current_qb_customer()
+    customer_id = get_current_qb_customer(request)
     if not customer_id:
         raise HTTPException(status_code=401, detail="No QuickBooks customer selected")
 
@@ -30,7 +30,7 @@ async def locksmith_job(payload: JobCreate, request: Request):
             qty=payload.Qty,
             rate=payload.UnitPrice,
             item_name=payload.service.value,
-            customer_id=customer_id
+            request=request
         )
     except HTTPException:
         raise
