@@ -1,4 +1,9 @@
+# app2/utils/qb/py
+
+import os
+import base64
 import httpx
+from fastapi import HTTPException
 from datetime import date
 from urllib.parse import quote
 from utils.session import get_tokens_and_realm_id
@@ -13,6 +18,40 @@ def build_qb_headers(access_token: str) -> dict:
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
+
+
+async def refresh_qb_tokens() -> tuple[str, str]:
+    refresh_token = os.getenv("QB_REFRESH_TOKEN")
+    client_id = os.getenv("QB_CLIENT_ID")
+    client_secret = os.getenv("QB_CLIENT_SECRET")
+
+    if not refresh_token or not client_id or not client_secret:
+        raise HTTPException(status_code=500, detail="Missing QuickBooks credentials")
+
+    auth = f"{client_id}:{client_secret}".encode()
+    headers = {
+        "Authorization": f"Basic {base64.b64encode(auth).decode()}",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json",
+    }
+
+    data = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer",
+            headers=headers,
+            data=data,
+        )
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail=f"QuickBooks refresh failed: {response.text}")
+
+    token_data = response.json()
+    return token_data["access_token"], token_data["refresh_token"]
 
 
 async def search_customers(access_token: str, realm_id: str) -> list[dict]:

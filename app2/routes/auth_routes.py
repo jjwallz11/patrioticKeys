@@ -16,6 +16,7 @@ from utils.tokens import (
 )
 
 from utils.csrf import verify_csrf
+from utils.qb import refresh_qb_tokens
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/session/login")
@@ -43,12 +44,22 @@ async def login(payload: LoginRequest):
     if payload.email != user["email"] or payload.password != user["password"]:
         raise HTTPException(status_code=400, detail="Invalid credentials.")
 
-    token_expires = timedelta(days=7) if payload.remember_me else timedelta(hours=12)
-    access_token = create_access_token({"sub": user["email"]}, expires_delta=token_expires)
+    try:
+        qb_access_token, _ = await refresh_qb_tokens()
+    except HTTPException:
+        raise HTTPException(status_code=502, detail="QuickBooks token refresh failed")
+
+    token_expires = timedelta(hours=1)
     csrf_token = generate_csrf_token()
     secure_cookie = settings.ENVIRONMENT == "production"
     realm_id = settings.QB_REALM_ID
 
+    try:
+        qb_access_token, _ = await refresh_qb_tokens()
+    except HTTPException as e:
+        raise HTTPException(status_code=502, detail="QuickBooks token refresh failed")
+
+    realm_id = settings.QB_REALM_ID
     response = JSONResponse(content={
         "message": "Login successful",
         "user": {
@@ -61,7 +72,7 @@ async def login(payload: LoginRequest):
 
     response.set_cookie(
         key="qb_access_token",
-        value=access_token,
+        value=qb_access_token,
         httponly=True,
         samesite="none",
         secure=secure_cookie,
