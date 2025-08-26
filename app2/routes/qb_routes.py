@@ -20,8 +20,6 @@ router = APIRouter()
 @router.get("/customers")
 async def list_customers(
     request: Request,
-    query: str = "",  # simplified to avoid aliasing confusion
-    limit: int = Query(25, ge=1, le=100),
     _ = Depends(get_current_user),
 ):
     access_token = request.cookies.get("access_token")
@@ -30,7 +28,7 @@ async def list_customers(
     if not access_token or not realm_id:
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
 
-    return await search_customers(query, limit, access_token, realm_id)
+    return await search_customers("", 100, access_token, realm_id)
 
 # Create a new customer
 @router.post("/customers")
