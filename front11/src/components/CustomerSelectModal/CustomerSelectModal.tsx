@@ -28,7 +28,7 @@ const CustomerSelectModal = ({
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await csrfFetch("/api/customers", { credentials: "include" });
+        const res = await csrfFetch("/api/qb/customers", { credentials: "include" });
         if (!res.ok) throw new Error("Failed to load customers");
         const data = await res.json();
         setCustomers(data.customers || []);
