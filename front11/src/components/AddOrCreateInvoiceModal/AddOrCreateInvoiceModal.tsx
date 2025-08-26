@@ -20,11 +20,16 @@ const AddOrCreateInvoiceModal = ({
     setLoading(true);
     setError(null);
     try {
-      const response = await csrfFetch(`/api/customers/${customerId}/invoices/today`, {
-        method: "POST",
-      });
+      const response = await csrfFetch(
+        `/api/customers/${customerId}/invoices/today`,
+        {
+          method: "POST",
+        }
+      );
 
       if (!response.ok) {
+        const invoice = await response.json();
+        console.log("Invoice created or resumed:", invoice);
         const data = await response.json();
         throw new Error(data.detail || "Failed to start invoice");
       }
@@ -45,7 +50,11 @@ const AddOrCreateInvoiceModal = ({
       </div>
 
       <div className="base-modal__actions">
-        <button className="btn-edit" onClick={handleCreateInvoice} disabled={loading}>
+        <button
+          className="btn-edit"
+          onClick={handleCreateInvoice}
+          disabled={loading}
+        >
           {loading ? "Starting..." : "Yes, Start Invoice"}
         </button>
         <button className="btn-delete" onClick={onClose} disabled={loading}>

@@ -11,7 +11,7 @@ interface QBItem {
 
 interface ItemSelectModalProps {
   onClose: () => void;
-  onItemSelect: (id: string) => void;
+  onItemSelect: (item: QBItem) => void;
 }
 
 const ItemSelectModal = ({ onClose, onItemSelect }: ItemSelectModalProps) => {
@@ -36,8 +36,8 @@ const ItemSelectModal = ({ onClose, onItemSelect }: ItemSelectModalProps) => {
     fetchItems();
   }, []);
 
-  const handleSelect = (id: string) => {
-    onItemSelect(id);
+  const handleSelect = (item: QBItem) => {
+    onItemSelect(item);
     onClose();
   };
 
@@ -51,7 +51,7 @@ const ItemSelectModal = ({ onClose, onItemSelect }: ItemSelectModalProps) => {
         <ul className="item-list">
           {items.map((item) => (
             <li key={item.id}>
-              <button className="btn-edit" onClick={() => handleSelect(item.id)}>
+              <button className="btn-edit" onClick={() => handleSelect(item)}>
                 {item.name}
               </button>
             </li>

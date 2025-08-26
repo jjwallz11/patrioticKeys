@@ -3,8 +3,11 @@
 import React, { useState } from "react";
 import AddOrCreateInvoiceModal from "../../components/AddOrCreateInvoiceModal";
 import ScanVinModal from "../../components/ScanVinModal";
+import VinResultsModal from "../../components/VinResultsModal";
 import CustomerSelectModal from "../../components/CustomerSelectModal";
 import ChangePasswordModal from "../../components/ChangePasswordModal";
+import { VehicleResponse } from "../../types";
+import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
   const [showAddInvoice, setShowAddInvoice] = useState(false);
@@ -12,19 +15,19 @@ const HomePage: React.FC = () => {
   const [showCustomerSelect, setShowCustomerSelect] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [customerID, setCustomerID] = useState<string | null>(null);
+  const [vinResult, setVinResult] = useState<VehicleResponse | null>(null);
+  const [showVinResultsModal, setShowVinResultsModal] = useState(false);
+  const [lastSix, setLastSix] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   return (
-    <div className="home-page" style={{ padding: "2rem", textAlign: "center" }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-          marginTop: "2rem",
-        }}
-      >
+    <div className="home-page">
+      <div>
         <button onClick={() => setShowAddInvoice(true)}>
           Add or Create Invoice
+        </button>
+        <button onClick={() => navigate("/invoice")}>
+          Review & Send Invoice
         </button>
         <button onClick={() => setShowScanVin(true)}>Scan VIN</button>
         <button onClick={() => setShowCustomerSelect(true)}>
@@ -41,7 +44,22 @@ const HomePage: React.FC = () => {
           onClose={() => setShowAddInvoice(false)}
         />
       )}
-      {showScanVin && <ScanVinModal onClose={() => setShowScanVin(false)} />}
+      {showScanVin && (
+        <ScanVinModal
+          onClose={() => setShowScanVin(false)}
+          setVinResult={setVinResult}
+          setLastSix={setLastSix}
+          openResultsModal={() => setShowVinResultsModal(true)}
+        />
+      )}
+
+      {showVinResultsModal && vinResult && (
+        <VinResultsModal
+          vinData={vinResult}
+          isOpen={showVinResultsModal}
+          onClose={() => setShowVinResultsModal(false)}
+        />
+      )}
       {showCustomerSelect && (
         <CustomerSelectModal
           onClose={() => setShowCustomerSelect(false)}

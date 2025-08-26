@@ -83,7 +83,12 @@ async def get_or_create_today_invoice(customer_id: str, access_token: str, realm
     r.raise_for_status()
     invoices = r.json().get("QueryResponse", {}).get("Invoice", []) or []
     if invoices:
-        return {"Id": invoices[0]["Id"], "DocNumber": invoices[0].get("DocNumber")}
+        invoice_id = invoices[0]["Id"]
+        get_url = f"{QB_BASE}/{realm_id}/invoice/{invoice_id}"
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            r = await client.get(get_url, headers=build_qb_headers(access_token))
+        r.raise_for_status()
+        return r.json().get("Invoice", {})
 
     # Create a new invoice if none found
     create_url = f"{QB_BASE}/{realm_id}/invoice"

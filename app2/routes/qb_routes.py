@@ -56,20 +56,24 @@ async def get_or_create_invoice_today(
 ):
     verify_csrf(request)
     set_current_qb_customer(customer_id)
-    return await get_or_create_today_invoice(customer_id)
 
-@router.get("/qb/items")
-async def get_items():
-    items = await get_all_qb_items()
-    return {"items": items}
+    access_token = request.cookies.get("access_token")
+    realm_id = request.cookies.get("realm_id")
+
+    if not access_token or not realm_id:
+        raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
+
+    return await get_or_create_today_invoice(customer_id, access_token, realm_id)
 
 # Add line item to invoice (existing or new)
 @router.post("/invoices/items")
-async def add_invoice_item(
-    payload: dict = Body(...),
-    _ = Depends(get_current_user),
-):
-    return await add_job_to_invoice(payload)
+async def add_invoice_item(payload: dict = Body(...)):
+    return await add_job_to_invoice(
+        description=payload["description"],
+        qty=payload.get("qty", 1),
+        rate=payload.get("rate", 0),
+        item_name=payload["item_id"]
+    )
 
 # Get current stored customer for session
 @router.get("/session-customer")
@@ -111,3 +115,19 @@ async def send_invoice_to_customer(request: Request, _=Depends(get_current_user)
     invoice = await get_or_create_today_invoice(customer["id"], access_token, realm_id)
     await send_invoice_email(invoice["Id"], access_token, realm_id)
     return {"message": f"Invoice {invoice['DocNumber']} sent to customer {customer['display_name']}"}
+
+@router.get("/invoice")
+async def get_today_invoice(request: Request, _=Depends(get_current_user)):
+    session_id = get_session_id(request)
+    access_token = request.cookies.get("access_token")
+    realm_id = request.cookies.get("realm_id")
+
+    if not all([session_id, access_token, realm_id]):
+        raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
+
+    customer_id = await request.app.state.session_store.get(f"{session_id}:qb_customer")
+    if not customer_id:
+        raise HTTPException(status_code=400, detail="No active customer found in session")
+
+    invoice = await get_or_create_today_invoice(customer_id, access_token, realm_id)
+    return invoice

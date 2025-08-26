@@ -1,27 +1,40 @@
+// front11/src/components/AddToInvoiceModal/AddToInvoiceModal.tsx
+
 import React, { useState } from "react";
 import BaseModal from "../BaseModal/BaseModal";
 import ItemSelectModal from "../ItemSelectModal/ItemSelectModal";
 import csrfFetch from "../../utils/csrf";
+import { VehicleResponse } from "../../types";
 
 interface AddToInvoiceModalProps {
-  vin: string;
+  vehicle: VehicleResponse;
   invoiceId: string;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
 const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
-  vin,
+  vehicle,
   invoiceId,
   onClose,
   onSuccess,
 }) => {
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [showItemSelect, setShowItemSelect] = useState(false);
+
+  const getFormattedDescription = (itemName: string) => {
+    return `**${itemName}**\n${vehicle.ModelYear || "Unknown"} ${
+      vehicle.Make || "Unknown"
+    } ${vehicle.Model || "Unknown"} (…${vehicle.VIN?.slice(-6) || "XXXXXX"})`;
+  };
+
   const [description, setDescription] = useState("");
 
   const handleSubmit = async () => {
-    if (!selectedItemId) {
+    if (!selectedItem) {
       alert("Please select an item.");
       return;
     }
@@ -30,9 +43,9 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
       const res = await csrfFetch("/api/invoices/items", {
         method: "POST",
         body: JSON.stringify({
-          vin,
+          vin: vehicle.VIN,
           invoice_id: invoiceId,
-          item_id: selectedItemId,
+          item_id: selectedItem.id,
           description,
         }),
       });
@@ -50,15 +63,17 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
   return (
     <>
       <BaseModal title="Add Line Item" onClose={onClose} onSave={handleSubmit}>
-        <p><strong>VIN:</strong> {vin}</p>
+        <p>
+          <strong>VIN:</strong> {vehicle.VIN}
+        </p>
 
         <button className="btn-edit" onClick={() => setShowItemSelect(true)}>
-          {selectedItemId ? "Change Item" : "Select Item"}
+          {selectedItem ? "Change Item" : "Select Item"}
         </button>
 
-        {selectedItemId && (
+        {selectedItem && (
           <p style={{ marginTop: "0.5rem" }}>
-            Selected Item ID: <code>{selectedItemId}</code>
+            Selected Item ID: <code>{selectedItem.id}</code>
           </p>
         )}
 
@@ -66,14 +81,16 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
           placeholder="Optional Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          rows={5}
         />
       </BaseModal>
 
       {showItemSelect && (
         <ItemSelectModal
           onClose={() => setShowItemSelect(false)}
-          onItemSelect={(id) => {
-            setSelectedItemId(id);
+          onItemSelect={(item) => {
+            setSelectedItem(item);
+            setDescription(getFormattedDescription(item.name));
             setShowItemSelect(false);
           }}
         />
