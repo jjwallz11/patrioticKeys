@@ -19,11 +19,20 @@ def build_qb_headers(access_token: str) -> dict:
 async def search_customers(access_token: str, realm_id: str) -> list[dict]:
     query = "select * from Customer"
     url = f"{QB_BASE}/{realm_id}/query?query={query}"
+    
+    print("Calling QuickBooks API:", url)
+    print("Using access token:", access_token[:8], "...")  # just for trace, not full token
+    print("Realm ID:", realm_id)
+    print("Query:", query)
+    
     async with httpx.AsyncClient() as client:
         try:
             r = await client.get(url, headers=build_qb_headers(access_token))
             r.raise_for_status()
+            json_resp = r.json()
+            print("QuickBooks response:", r.json())
             return r.json().get("QueryResponse", {}).get("Customer", [])
+        
         except httpx.HTTPStatusError as e:
             print("QuickBooks API error:", e.response.status_code, e.response.text)
             return []
