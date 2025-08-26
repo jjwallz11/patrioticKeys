@@ -1,17 +1,21 @@
-// vite.config.ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
-export default defineConfig(({ mode }) => ({
-  plugins: [react()],
-  assetsInclude: ["**/*.PNG"],
-  // Only proxy in development; in production we hit the real API URL.
-  server: mode === "development"
-    ? {
-        open: true,
-        proxy: {
-          "/api": "http://127.0.0.1:2913",
-        },
-      }
-    : undefined,
-}));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, resolve(__dirname, '..'), '');
+
+  return {
+    plugins: [react()],
+    define: {
+      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL),
+    },
+    server: {
+      open: true,
+    },
+  };
+});
