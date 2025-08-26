@@ -4,7 +4,6 @@ from fastapi import APIRouter, Request, HTTPException
 from starlette.responses import RedirectResponse
 import os
 import urllib.parse
-from fastapi.responses import JSONResponse
 import httpx
 import base64
 
@@ -55,9 +54,9 @@ async def qb_callback(request: Request):
     auth_header = base64.b64encode(auth_bytes).decode("utf-8")
     
     headers = {
-    "Accept": "application/json",
-    "Content-Type": "application/x-www-form-urlencoded",
-    "Authorization": f"Basic {auth_header}",
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": f"Basic {auth_header}",
     }
 
     body = {
@@ -76,14 +75,10 @@ async def qb_callback(request: Request):
     access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
 
-    os.environ["QB_ACCESS_TOKEN"] = access_token
-    os.environ["QB_REFRESH_TOKEN"] = refresh_token
-    os.environ["QB_REALM_ID"] = realm_id
+    response = RedirectResponse(url="/")
 
-    return JSONResponse({
-        "message": "Authorization successful",
-        "realm_id": realm_id,
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "expires_in": token_data.get("expires_in"),
-    })
+    response.set_cookie("qb_access_token", access_token, httponly=True)
+    response.set_cookie("qb_refresh_token", refresh_token, httponly=True)
+    response.set_cookie("qb_realm_id", realm_id, httponly=True)
+
+    return response
