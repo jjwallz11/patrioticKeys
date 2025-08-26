@@ -16,7 +16,7 @@ from services import add_job_to_invoice
 
 router = APIRouter()
 
-# List or search customers (optional query param)
+# List or search customers
 @router.get("/customers")
 async def list_customers(
     request: Request,
@@ -28,7 +28,7 @@ async def list_customers(
     if not access_token or not realm_id:
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
 
-    return await search_customers("", 100, access_token, realm_id)
+    return await search_customers(access_token, realm_id)
 
 # Create a new customer
 @router.post("/customers")

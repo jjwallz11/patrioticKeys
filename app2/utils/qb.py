@@ -16,14 +16,9 @@ def build_qb_headers(access_token: str) -> dict:
     }
 
 
-async def search_customers(q: str, limit: int, access_token: str, realm_id: str) -> list[dict]:
-    escaped_q = quote(q)
-    query = (
-        "select * from Customer"
-        if not q else
-        f"select * from Customer where DisplayName like '%{escaped_q}%'"
-    )
-    url = f"{QB_BASE}/{realm_id}/query?query={query}&limit={limit}"
+async def search_customers(access_token: str, realm_id: str) -> list[dict]:
+    query = "select * from Customer"
+    url = f"{QB_BASE}/{realm_id}/query?query={query}"
     async with httpx.AsyncClient() as client:
         try:
             r = await client.get(url, headers=build_qb_headers(access_token))
