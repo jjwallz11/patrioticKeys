@@ -13,15 +13,10 @@ async def connect_to_qb():
     print("🔁 /connect-to-qb route was hit")
     client_id = os.getenv("QB_CLIENT_ID")
     redirect_uri = os.getenv("QB_REDIRECT_URI")
-    environment = os.getenv("QB_ENVIRONMENT", "sandbox")
     scope = "com.intuit.quickbooks.accounting openid profile email phone address"
     state = "secureRandomStringOrCSRFToken"
 
-    base_auth_url = (
-        "https://appcenter.intuit.com/connect/oauth2"
-        if environment == "production"
-        else "https://sandbox.appcenter.intuit.com/connect/oauth2"
-    )
+    base_auth_url = "https://appcenter.intuit.com/connect/oauth2"
 
     params = {
         "client_id": client_id,
