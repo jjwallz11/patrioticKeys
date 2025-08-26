@@ -21,7 +21,7 @@ async def search_customers(access_token: str, realm_id: str) -> list[dict]:
     url = f"{QB_BASE}/{realm_id}/query?query={query}"
     
     print("Calling QuickBooks API:", url)
-    print("Using access token:", access_token[:8], "...")  # just for trace, not full token
+    print("🔸 FULL ACCESS TOKEN:", access_token)
     print("Realm ID:", realm_id)
     print("Query:", query)
     
