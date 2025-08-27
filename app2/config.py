@@ -23,12 +23,15 @@ class Settings(BaseSettings):
 
     # === Environment ===
     DEBUG: bool = ENV == "development"
-    QB_ENVIRONMENT: str = ENV
+    ENVIRONMENT: str = ENV
 
     # === JWT Auth ===
     JWT_SECRET: str
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_MINUTES: int = 720
+
+    # === QuickBooks ===
+    QB_ENVIRONMENT: str = "production"
     
     model_config = ConfigDict(extra="allow")
 
