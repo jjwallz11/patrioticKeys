@@ -38,7 +38,7 @@ class LoginRequest(BaseModel):
 
 
 @router.post("/session/login")
-async def login(payload: LoginRequest):
+async def login(payload: LoginRequest, request: Request):
     user = USER_STORE
 
     if payload.email != user["email"] or payload.password != user["password"]:
@@ -47,14 +47,13 @@ async def login(payload: LoginRequest):
     token_expires = timedelta(hours=1)
     csrf_token = generate_csrf_token()
     secure_cookie = settings.ENVIRONMENT == "production"
-    realm_id = settings.QB_REALM_ID
 
     try:
         qb_access_token, _ = await refresh_qb_tokens()
     except HTTPException as e:
         raise HTTPException(status_code=502, detail="QuickBooks token refresh failed")
 
-    realm_id = settings.QB_REALM_ID
+    realm_id = request.cookies.get("qb_realm_id") or ""
     response = JSONResponse(content={
         "message": "Login successful",
         "user": {
