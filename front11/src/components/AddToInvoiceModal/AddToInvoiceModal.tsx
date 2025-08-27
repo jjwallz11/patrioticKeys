@@ -26,9 +26,9 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
   const [showItemSelect, setShowItemSelect] = useState(false);
 
   const getFormattedDescription = (itemName: string) => {
-    return `**${itemName}**\n${vehicle.ModelYear || "Unknown"} ${
-      vehicle.Make || "Unknown"
-    } ${vehicle.Model || "Unknown"} (…${vehicle.VIN?.slice(-6) || "XXXXXX"})`;
+    return `**${itemName}**\n${vehicle.year || "Unknown"} ${
+      vehicle.make || "Unknown"
+    } ${vehicle.model || "Unknown"} (…${vehicle.vin?.slice(-6) || "XXXXXX"})`;
   };
 
   const [description, setDescription] = useState("");
@@ -43,7 +43,7 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
       const res = await csrfFetch("/api/invoices/items", {
         method: "POST",
         body: JSON.stringify({
-          vin: vehicle.VIN,
+          vin: vehicle.vin,
           invoice_id: invoiceId,
           item_id: selectedItem.id,
           description,
@@ -64,7 +64,7 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
     <>
       <BaseModal title="Add Line Item" onClose={onClose} onSave={handleSubmit}>
         <p>
-          <strong>VIN:</strong> {vehicle.VIN}
+          <strong>VIN:</strong> {vehicle.vin}
         </p>
 
         <button className="btn-edit" onClick={() => setShowItemSelect(true)}>
