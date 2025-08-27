@@ -38,6 +38,8 @@ const HomePage: React.FC = () => {
         </button>
       </div>
 
+      <p>Selected Customer ID: {customerID}</p>
+      
       {showAddInvoice && customerID && (
         <AddOrCreateInvoiceModal
           customerId={customerID}
