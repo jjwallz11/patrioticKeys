@@ -22,7 +22,7 @@ router = APIRouter()
 @router.get("/customers")
 async def list_customers(request: Request):
     qb_access_token = request.cookies.get("qb_access_token")
-    realm_id = request.cookies.get("realm_id")
+    realm_id = request.cookies.get("qb_realm_id")
 
     if not qb_access_token or not realm_id:
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
@@ -33,7 +33,7 @@ async def list_customers(request: Request):
 @router.post("/customers")
 async def create_new_customer(request: Request):
     qb_access_token = request.cookies.get("qb_access_token")
-    realm_id = request.cookies.get("realm_id")
+    realm_id = request.cookies.get("qb_realm_id")
 
     if not qb_access_token or not realm_id:
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
@@ -47,7 +47,7 @@ async def get_or_create_invoice_today(customer_id: str, request: Request):
     set_current_qb_customer(customer_id, request)
 
     qb_access_token = request.cookies.get("qb_access_token")
-    realm_id = request.cookies.get("realm_id")
+    realm_id = request.cookies.get("qb_realm_id")
 
     if not qb_access_token or not realm_id:
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
@@ -83,7 +83,7 @@ async def reset_customer(request: Request):
 async def send_invoice_to_customer(request: Request):
     verify_csrf(request)
     qb_access_token = request.cookies.get("qb_access_token")
-    realm_id = request.cookies.get("realm_id")
+    realm_id = request.cookies.get("qb_realm_id")
 
     if not all([qb_access_token, realm_id]):
         raise HTTPException(status_code=401, detail="Missing authentication context.")
@@ -104,7 +104,7 @@ async def send_invoice_to_customer(request: Request):
 async def get_today_invoice(request: Request):
     session_id = get_session_id(request)
     qb_access_token = request.cookies.get("qb_access_token")
-    realm_id = request.cookies.get("realm_id")
+    realm_id = request.cookies.get("qb_realm_id")
 
     if not all([session_id, qb_access_token, realm_id]):
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
