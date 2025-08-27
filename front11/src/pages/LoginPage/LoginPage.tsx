@@ -19,7 +19,11 @@ const LoginPage: React.FC = () => {
     try {
       const res = await fetch("/api/session/login", {
         method: "POST",
-        body: JSON.stringify({ email, password, remember_me: rememberMe }),
+        body: JSON.stringify({
+          email,
+          password,
+          remember_me: false
+        }),
       });
 
       if (!res.ok) {
