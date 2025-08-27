@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import BaseModal from "../BaseModal/BaseModal";
 import AddCustomerModal from "../AddCustomerModal/AddCustomerModal";
 import csrfFetch from "../../utils/csrf";
+import "../BaseModal/BaseModal.css";
 
 interface Customer {
   id: string;
