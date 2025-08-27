@@ -35,7 +35,7 @@ const LoginPage: React.FC = () => {
         throw new Error(data.detail || "Login failed");
       }
 
-       await csrfFetch("/api/qb/connect", { method: "GET" });
+       await csrfFetch("/api/qb-auth/connect-to-qb", { method: "GET" });
     } catch (err: any) {
       setError(err.message);
     }
