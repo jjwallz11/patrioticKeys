@@ -36,7 +36,7 @@ const LoginPage: React.FC = () => {
       }
 
       // Now that login succeeded, redirect to QuickBooks connection
-      window.location.href = "/api/qb-auth/connect-to-qb";
+      window.location.href = "https://patriotickeys-production.up.railway.app/api/qb-auth/connect-to-qb";
     } catch (err: any) {
       setError(err.message);
     }
