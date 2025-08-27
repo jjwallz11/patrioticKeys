@@ -8,9 +8,13 @@ from datetime import date
 from urllib.parse import quote
 from utils.session import get_tokens_and_realm_id
 from fastapi import Request
+from config import settings
 
-QB_BASE = "https://quickbooks.api.intuit.com/v3/company"
-
+QB_BASE = (
+    "https://sandbox-quickbooks.api.intuit.com/v3/company"
+    if settings.QB_ENVIRONMENT == "sandbox"
+    else "https://quickbooks.api.intuit.com/v3/company"
+)
 
 def build_qb_headers(qb_access_token: str) -> dict:
     return {
