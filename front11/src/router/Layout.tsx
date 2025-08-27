@@ -1,7 +1,7 @@
 // src/router/layout.tsx
 
 import { Outlet } from "react-router-dom";
-import "./layout.css"; // optional if you plan shared styles
+import "./Layout.css";
 
 const Layout = () => {
   return (
