@@ -26,7 +26,7 @@ const LoginPage: React.FC = () => {
         body: JSON.stringify({
           email,
           password,
-          remember_me: false
+          remember_me: false,
         }),
       });
 
@@ -35,7 +35,8 @@ const LoginPage: React.FC = () => {
         throw new Error(data.detail || "Login failed");
       }
 
-       await csrfFetch("/api/qb-auth/connect-to-qb", { method: "GET" });
+      // Now that login succeeded, redirect to QuickBooks connection
+      window.location.href = "/api/qb-auth/connect-to-qb";
     } catch (err: any) {
       setError(err.message);
     }
