@@ -29,9 +29,6 @@ class Settings(BaseSettings):
     JWT_SECRET: str
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_MINUTES: int = 720
-
-    # === QuickBooks ===
-    QB_REALM_ID: str
     
     model_config = ConfigDict(extra="allow")
 
