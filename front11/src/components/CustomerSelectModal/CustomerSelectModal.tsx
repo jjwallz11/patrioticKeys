@@ -16,7 +16,7 @@ interface Customer {
 
 interface CustomerSelectModalProps {
   onClose: () => void;
-  onCustomerSelect: (customerId: string) => void;
+  onCustomerSelect: (customerId: string, customerName: string) => void;
   setVinResult: (data: VehicleResponse) => void;
   setLastSix: (val: string) => void;
   openResultsModal: () => void;
@@ -68,11 +68,11 @@ const CustomerSelectModal = ({
     fetchCustomers();
   }, [showAddCustomer]);
 
-  const handleSelect = (id: string) => {
-    onCustomerSelect(id);
-    onClose();
-    setJustSelectedCustomer(true);
-  };
+ const handleSelect = (customer: Customer) => {
+  onCustomerSelect(customer.id, customer.name);
+  onClose();
+  setJustSelectedCustomer(true);
+};
 
   return (
     <>
@@ -89,7 +89,7 @@ const CustomerSelectModal = ({
               <li key={customer.id}>
                 <button
                   className="btn-edit"
-                  onClick={() => handleSelect(customer.id)}
+                  onClick={() => handleSelect(customer)}
                 >
                   {customer.name}
                 </button>

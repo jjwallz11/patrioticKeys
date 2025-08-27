@@ -14,7 +14,10 @@ const HomePage: React.FC = () => {
   const [showScanVin, setShowScanVin] = useState(false);
   const [showCustomerSelect, setShowCustomerSelect] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const [customerID, setCustomerID] = useState<string | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [vinResult, setVinResult] = useState<VehicleResponse | null>(null);
   const [showVinResultsModal, setShowVinResultsModal] = useState(false);
   const [lastSix, setLastSix] = useState<string | null>(null);
@@ -38,11 +41,15 @@ const HomePage: React.FC = () => {
         </button>
       </div>
 
-      <p>Selected Customer ID: {customerID}</p>
-      
-      {showAddInvoice && customerID && (
+      {selectedCustomer && (
+        <p>
+          Selected Customer: {selectedCustomer.name} (ID: {selectedCustomer.id})
+        </p>
+      )}
+
+      {showAddInvoice && selectedCustomer && (
         <AddOrCreateInvoiceModal
-          customerId={customerID}
+          customerId={selectedCustomer.id}
           onClose={() => setShowAddInvoice(false)}
         />
       )}
@@ -65,7 +72,10 @@ const HomePage: React.FC = () => {
       {showCustomerSelect && (
         <CustomerSelectModal
           onClose={() => setShowCustomerSelect(false)}
-          onCustomerSelect={(id) => setCustomerID(id)}
+          onCustomerSelect={(id, name) => {
+            setSelectedCustomer({ id, name });
+            setShowScanVin(true);
+          }}
           setVinResult={setVinResult}
           setLastSix={setLastSix}
           openResultsModal={() => setShowVinResultsModal(true)}
