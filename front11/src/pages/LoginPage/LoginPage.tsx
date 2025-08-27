@@ -17,7 +17,7 @@ const LoginPage: React.FC = () => {
     setError("");
 
     try {
-      const res = await csrfFetch("/api/session/login", {
+      const res = await fetch("/api/session/login", {
         method: "POST",
         body: JSON.stringify({ email, password, remember_me: rememberMe }),
       });
