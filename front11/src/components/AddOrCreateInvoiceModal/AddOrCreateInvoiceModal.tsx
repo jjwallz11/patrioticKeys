@@ -27,12 +27,14 @@ const AddOrCreateInvoiceModal = ({
         }
       );
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const invoice = await response.json();
-        console.log("Invoice created or resumed:", invoice);
-        const data = await response.json();
         throw new Error(data.detail || "Failed to start invoice");
       }
+
+      console.log("Invoice created or resumed:", data);
+      onClose();
 
       onClose();
     } catch (err: any) {
