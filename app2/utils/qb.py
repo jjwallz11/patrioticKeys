@@ -48,6 +48,7 @@ async def refresh_qb_tokens() -> tuple[str, str]:
         )
 
     if response.status_code != 200:
+        print("🔴 QuickBooks 400 response:", response.text)
         raise HTTPException(status_code=500, detail=f"QuickBooks refresh failed: {response.text}")
 
     token_data = response.json()
