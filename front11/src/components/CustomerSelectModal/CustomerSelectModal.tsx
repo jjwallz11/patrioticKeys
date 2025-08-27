@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import BaseModal from "../BaseModal/BaseModal";
 import AddCustomerModal from "../AddCustomerModal/AddCustomerModal";
+import ScanVinModal from "../ScanVinModal";
 import csrfFetch from "../../utils/csrf";
+import { VehicleResponse } from "../../types";
 import "../BaseModal/BaseModal.css";
 
 interface Customer {
@@ -15,28 +17,45 @@ interface Customer {
 interface CustomerSelectModalProps {
   onClose: () => void;
   onCustomerSelect: (customerId: string) => void;
+  setVinResult: (data: VehicleResponse) => void;
+  setLastSix: (val: string) => void;
+  openResultsModal: () => void;
 }
 
 const CustomerSelectModal = ({
   onClose,
   onCustomerSelect,
+  setVinResult,
+  setLastSix,
+  openResultsModal,
 }: CustomerSelectModalProps) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddCustomer, setShowAddCustomer] = useState(false);
+  const [showScanVin, setShowScanVin] = useState(false);
+  const [justSelectedCustomer, setJustSelectedCustomer] = useState(false);
+
+  useEffect(() => {
+    if (justSelectedCustomer && !showScanVin) {
+      setShowScanVin(true);
+      setJustSelectedCustomer(false);
+    }
+  }, [justSelectedCustomer, showScanVin]);
 
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await csrfFetch("/api/qb/customers", { credentials: "include" });
+        const res = await csrfFetch("/api/qb/customers", {
+          credentials: "include",
+        });
         if (!res.ok) throw new Error("Failed to load customers");
         const data = await res.json();
         setCustomers(
           data.map((c: any) => ({
             id: c.Id,
             name: c.DisplayName || c.FullyQualifiedName || "Unnamed",
-            email: c.PrimaryEmailAddr?.Address || ""
+            email: c.PrimaryEmailAddr?.Address || "",
           }))
         );
       } catch (err: any) {
@@ -52,6 +71,7 @@ const CustomerSelectModal = ({
   const handleSelect = (id: string) => {
     onCustomerSelect(id);
     onClose();
+    setJustSelectedCustomer(true);
   };
 
   return (
@@ -90,7 +110,14 @@ const CustomerSelectModal = ({
           </div>
         </div>
       </BaseModal>
-
+      {showScanVin && (
+        <ScanVinModal
+          onClose={() => setShowScanVin(false)}
+          setVinResult={setVinResult}
+          setLastSix={setLastSix}
+          openResultsModal={openResultsModal}
+        />
+      )}
       {showAddCustomer && (
         <AddCustomerModal onClose={() => setShowAddCustomer(false)} />
       )}

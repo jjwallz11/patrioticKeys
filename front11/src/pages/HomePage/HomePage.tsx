@@ -64,6 +64,9 @@ const HomePage: React.FC = () => {
         <CustomerSelectModal
           onClose={() => setShowCustomerSelect(false)}
           onCustomerSelect={(id) => setCustomerID(id)}
+          setVinResult={setVinResult}
+          setLastSix={setLastSix}
+          openResultsModal={() => setShowVinResultsModal(true)}
         />
       )}
       {showChangePassword && (

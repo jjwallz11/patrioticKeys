@@ -67,7 +67,7 @@ const ScanVinModal = ({
       setVin(extractedVin || "No VIN found");
 
       if (extractedVin) {
-        const res = await csrfFetch(`/api/vehicle/${extractedVin}`);
+        const res = await csrfFetch(`/api/vehicles/${extractedVin}`);
         const result: VehicleResponse = await res.json();
         const lastSix = extractedVin.slice(-6);
         setLastSix(lastSix);
