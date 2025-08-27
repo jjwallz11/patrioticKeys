@@ -19,6 +19,7 @@ const LoginPage: React.FC = () => {
     try {
       const res = await fetch("/api/session/login", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -27,7 +28,6 @@ const LoginPage: React.FC = () => {
           password,
           remember_me: false
         }),
-        credentials: "include",
       });
 
       if (!res.ok) {
