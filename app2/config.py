@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # === Environment ===
     DEBUG: bool = ENV == "development"
-    ENVIRONMENT: str = ENV
+    QB_ENVIRONMENT: str = ENV
 
     # === JWT Auth ===
     JWT_SECRET: str
