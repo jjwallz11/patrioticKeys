@@ -24,14 +24,38 @@ const ScanVinModal = ({
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
+    let scanning = true;
+    let attempts = 0;
+    let vinFound = false;
+
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: { facingMode: { exact: "environment" } },
         });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          videoRef.current.play();
+          await videoRef.current.play();
+
+          // Start scanning loop
+          const scanInterval = setInterval(async () => {
+            if (!vinFound && scanning && videoRef.current?.readyState === 4) {
+              const success = await captureAndScan(true); // pass silent mode
+              if (success) {
+                vinFound = true;
+                clearInterval(scanInterval);
+              }
+            }
+          }, 1000); // scan every 1 second
+
+          // Timeout after 7 seconds
+          setTimeout(() => {
+            if (!vinFound) {
+              setVin("No VIN found");
+              clearInterval(scanInterval);
+            }
+            scanning = false;
+          }, 7000);
         }
       } catch (err) {
         console.error("Camera access failed", err);
@@ -47,16 +71,15 @@ const ScanVinModal = ({
     };
   }, []);
 
-  const captureAndScan = async () => {
-    if (!canvasRef.current || !videoRef.current) return;
+  const captureAndScan = async (silent = false): Promise<boolean> => {
+    if (!canvasRef.current || !videoRef.current) return false;
     const ctx = canvasRef.current.getContext("2d");
-    if (!ctx) return;
+    if (!ctx) return false;
 
     canvasRef.current.width = videoRef.current.videoWidth;
     canvasRef.current.height = videoRef.current.videoHeight;
     ctx.drawImage(videoRef.current, 0, 0);
 
-    setProcessing(true);
     try {
       const { data } = await Tesseract.recognize(canvasRef.current, "eng", {
         logger: (m) => console.log(m),
@@ -64,24 +87,24 @@ const ScanVinModal = ({
 
       const match = data.text.match(/\b[A-HJ-NPR-Z0-9]{17}\b/);
       const extractedVin = match?.[0] || "";
-      setVin(extractedVin || "No VIN found");
-
       if (extractedVin) {
+        setVin(extractedVin);
         const res = await csrfFetch(`/api/vehicles/${extractedVin}`);
         const result: VehicleResponse = await res.json();
         const lastSix = extractedVin.slice(-6);
         setLastSix(lastSix);
-
-        const enrichedResult = { ...result, lastSix };
-        setVinResult(enrichedResult);
-
+        setVinResult({ ...result, lastSix });
         openResultsModal();
+        return true;
+      } else if (!silent) {
+        setVin("No VIN found");
       }
     } catch (err) {
       console.error("OCR or fetch failed", err);
-      setVin("Error during processing");
+      if (!silent) setVin("Error during processing");
     }
-    setProcessing(false);
+
+    return false;
   };
 
   return (
@@ -90,9 +113,7 @@ const ScanVinModal = ({
         <h2>Scan VIN</h2>
         <video ref={videoRef} className="video-preview" />
         <canvas ref={canvasRef} style={{ display: "none" }} />
-        <button onClick={captureAndScan} disabled={processing}>
-          {processing ? "Scanning..." : "Scan Frame"}
-        </button>
+        {processing && <p>Scanning...</p>}
         {vin && <p>Detected VIN: {vin}</p>}
         <button onClick={onClose}>Close</button>
       </div>
