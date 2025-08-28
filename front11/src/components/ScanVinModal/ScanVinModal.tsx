@@ -22,11 +22,10 @@ const ScanVinModal = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [vin, setVin] = useState("");
   const [processing, setProcessing] = useState(false);
+  const vinFoundRef = useRef(false);
 
   useEffect(() => {
     let scanning = true;
-    let attempts = 0;
-    let vinFound = false;
 
     const startCamera = async () => {
       try {
@@ -39,18 +38,22 @@ const ScanVinModal = ({
 
           // Start scanning loop
           const scanInterval = setInterval(async () => {
-            if (!vinFound && scanning && videoRef.current?.readyState === 4) {
-              const success = await captureAndScan(true); // pass silent mode
+            if (
+              !vinFoundRef.current &&
+              scanning &&
+              videoRef.current?.readyState === 4
+            ) {
+              const success = await captureAndScan(true);
               if (success) {
-                vinFound = true;
+                vinFoundRef.current = true;
                 clearInterval(scanInterval);
               }
             }
-          }, 1000); // scan every 1 second
+          }, 1000);
 
-          // Timeout after 7 seconds
+          // Timeout if nothing is found
           setTimeout(() => {
-            if (!vinFound) {
+            if (!vinFoundRef.current) {
               setVin("No VIN found");
               clearInterval(scanInterval);
             }
@@ -63,6 +66,7 @@ const ScanVinModal = ({
     };
 
     startCamera();
+
     return () => {
       if (videoRef.current?.srcObject) {
         const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
