@@ -20,7 +20,7 @@ const csrfFetch = async (
     ...options.headers,
   };
 
-  return fetch(`${API_BASE_URL}${url}`, {
+  return fetch(`${url}`, {
     ...options,
     headers,
     credentials: "include",
