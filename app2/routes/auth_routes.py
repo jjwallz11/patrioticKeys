@@ -72,7 +72,6 @@ async def login(payload: LoginRequest, request: Request):
         httponly=True,
         samesite="none",
         secure=secure_cookie,
-        domain=".up.railway.app",
         max_age=int(token_expires.total_seconds())
     )
     response.set_cookie(
@@ -81,7 +80,6 @@ async def login(payload: LoginRequest, request: Request):
         httponly=False,
         samesite="none",
         secure=secure_cookie,
-        domain=".up.railway.app",
         max_age=int(token_expires.total_seconds())
     )
     response.set_cookie(
@@ -90,7 +88,6 @@ async def login(payload: LoginRequest, request: Request):
         httponly=True,
         samesite="none",
         secure=secure_cookie,
-        domain=".up.railway.app",
         max_age=int(token_expires.total_seconds())
     )
 
