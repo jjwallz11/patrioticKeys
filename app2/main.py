@@ -7,6 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import router
 from config import settings
 from utils import session
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 app = FastAPI(title="Patriotic Keys API", debug=settings.DEBUG)
 app.state.session_store = session.session_store
@@ -37,9 +39,13 @@ async def startup_event():
 async def shutdown_event():
     logging.info("🛑 Patriotic Keys API shutting down")
 
-# Mount routes
+# Static files first
+app.mount("/assets", StaticFiles(directory="static/dist/assets"), name="assets")
+
+# API routes second
 app.include_router(router)
 
+# Root path (fallback for frontend) last
 @app.get("/")
-def root():
-    return {"message": "Welcome to Patriotic Keys API"}
+def serve_root():
+    return FileResponse("static/dist/index.html")
