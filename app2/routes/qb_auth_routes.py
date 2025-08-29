@@ -76,7 +76,7 @@ async def connect_to_qb():
     return RedirectResponse(auth_url)
 
 
-@router.get("/callback/")
+@router.get("/callback")
 async def qb_callback(request: Request):
     code = request.query_params.get("code")
     realm_id = request.query_params.get("realmId")
