@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import csrfFetch from "../../utils/csrf";
 import "./LoginPage.css";
 
 const LoginPage: React.FC = () => {
