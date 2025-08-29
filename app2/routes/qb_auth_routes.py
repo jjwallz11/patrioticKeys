@@ -96,13 +96,15 @@ async def qb_callback(request: Request):
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": f"Basic {auth_header}",
     }
-
+    
     body = {
         "grant_type": "authorization_code",
         "code": code,
         "redirect_uri": os.getenv("QB_REDIRECT_URI"),
     }
 
+    print("🚨 Using redirect_uri for token exchange:", os.getenv("QB_REDIRECT_URI"))
+    
     async with httpx.AsyncClient() as client:
         response = await client.post(token_url, data=body, headers=headers)
 
