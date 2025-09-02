@@ -87,7 +87,7 @@ async def qb_callback(request: Request):
     if not code or not realm_id:
         raise HTTPException(status_code=400, detail="Missing code or realmId in callback.")
 
-    token_url = "https://sandbox-accounts.platform.intuit.com/oauth2/v1/tokens/bearer"
+    token_url = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
     
     client_id = os.getenv("QB_CLIENT_ID")
     client_secret = os.getenv("QB_CLIENT_SECRET")
