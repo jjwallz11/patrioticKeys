@@ -62,7 +62,7 @@ async def connect_to_qb():
     scope = "com.intuit.quickbooks.accounting openid profile email phone address"
     state = "secureRandomStringOrCSRFToken"
 
-    base_auth_url = "https://appcenter.intuit.com/connect/oauth2"
+    base_auth_url = "https://sandbox.appcenter.intuit.com/connect/oauth2"
 
     params = {
         "client_id": client_id,
