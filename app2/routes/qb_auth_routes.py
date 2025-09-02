@@ -114,6 +114,10 @@ async def qb_callback(request: Request):
     if response.status_code != 200:
         raise HTTPException(status_code=500, detail=f"Token exchange failed: {response.text}")
 
+    if response.status_code != 200:
+        print("🟥 TOKEN RESPONSE TEXT:", response.text)
+        raise HTTPException(status_code=500, detail=f"Token exchange failed: {response.text}")
+
     token_data = response.json()
     qb_access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
