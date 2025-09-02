@@ -46,14 +46,13 @@ app.mount("/", StaticFiles(directory="static/dist", html=True), name="static")
 # Include your API routers here
 app.include_router(router)
 
-
 # Set the absolute path to index.html
-index_file = Path(__file__).resolve().parent / "static" / "dist" / "index.html"
+# index_file = Path(__file__).resolve().parent / "static" / "dist" / "index.html"
 
-@app.get("/")
-async def serve_root():
-    return FileResponse(index_file)
+# @app.get("/")
+# async def serve_root():
+#     return FileResponse(index_file)
 
-@app.get("/{full_path:path}")
-async def spa_fallback(full_path: str):
-    return FileResponse(index_file)
+# @app.get("/{full_path:path}")
+# async def spa_fallback(full_path: str):
+#     return FileResponse(index_file)
