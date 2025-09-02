@@ -73,6 +73,8 @@ async def connect_to_qb():
     }
 
     auth_url = f"{base_auth_url}?{urllib.parse.urlencode(params)}"
+    print("🧪 FULL AUTH URL:", auth_url)
+
     return RedirectResponse(auth_url)
 
 
