@@ -122,7 +122,7 @@ async def qb_callback(request: Request):
     token_data = response.json()
     qb_access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
-
+    print("🆕 REFRESH TOKEN:", refresh_token)
     response_redirect = RedirectResponse(url=os.getenv("QB_POST_LOGIN_REDIRECT", "/home"))
 
     response_redirect.set_cookie("qb_access_token", qb_access_token, httponly=True)
