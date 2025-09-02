@@ -47,7 +47,7 @@ app.mount("/", StaticFiles(directory="static/dist", html=True), name="static")
 app.include_router(router)
 
 # Set the absolute path to index.html
-# index_file = Path(__file__).resolve().parent / "static" / "dist" / "index.html"
+index_file = Path(__file__).resolve().parent / "static" / "dist" / "index.html"
 
 # @app.get("/")
 # async def serve_root():
