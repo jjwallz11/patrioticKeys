@@ -9,6 +9,7 @@ from config import settings
 from utils import session
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from pathlib import Path
 
 app = FastAPI(title="Patriotic Keys API", debug=settings.DEBUG)
 app.state.session_store = session.session_store
@@ -45,12 +46,14 @@ app.mount("/static", StaticFiles(directory="static/dist"), name="static")
 # Include your API routers here
 app.include_router(router)
 
-# Root route
+
+# Set the absolute path to index.html
+index_file = Path(__file__).resolve().parent / "static" / "dist" / "index.html"
+
 @app.get("/")
 async def serve_root():
-    return FileResponse("static/dist/index.html")
+    return FileResponse(index_file)
 
-# Catch-all fallback for SPA routes like /home
 @app.get("/{full_path:path}")
 async def spa_fallback(full_path: str):
-    return FileResponse("static/dist/index.html")
+    return FileResponse(index_file)
