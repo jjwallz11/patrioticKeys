@@ -53,6 +53,6 @@ index_file = Path(__file__).resolve().parent / "static" / "dist" / "index.html"
 # async def serve_root():
 #     return FileResponse(index_file)
 
-@app.get("/{full_path:path}")
-async def spa_fallback(full_path: str):
-    return FileResponse(index_file)
+# @app.get("/{full_path:path}")
+# async def spa_fallback(full_path: str):
+#     return FileResponse(index_file)
