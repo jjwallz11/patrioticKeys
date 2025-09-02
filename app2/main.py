@@ -41,7 +41,6 @@ async def shutdown_event():
 
 # Static files first
 app.mount("/assets", StaticFiles(directory="static/dist/assets"), name="assets")
-app.mount("/", StaticFiles(directory="static/dist", html=True), name="static-root")
 
 # API routes second
 app.include_router(router)
@@ -54,3 +53,5 @@ def serve_root():
 @app.get("/{full_path:path}")
 async def spa_fallback(full_path: str):
     return FileResponse("static/dist/index.html")
+
+app.mount("/", StaticFiles(directory="static/dist", html=True), name="static-root")
