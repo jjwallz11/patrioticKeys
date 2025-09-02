@@ -50,7 +50,7 @@ app.include_router(router)
 def serve_root():
     return FileResponse("static/dist/index.html")
 
-app.mount("/", StaticFiles(directory="static/dist", html=True), name="static-root")
+# app.mount("/", StaticFiles(directory="static/dist", html=True), name="static-root")
 
 @app.get("/{full_path:path}")
 async def spa_fallback(full_path: str):
