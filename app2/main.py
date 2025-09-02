@@ -39,19 +39,18 @@ async def startup_event():
 async def shutdown_event():
     logging.info("🛑 Patriotic Keys API shutting down")
 
-# Static files first
-app.mount("/assets", StaticFiles(directory="static/dist/assets"), name="assets")
+# Serve assets and other static files from /static/
+app.mount("/static", StaticFiles(directory="static/dist"), name="static")
 
-# API routes second
+# Include your API routers here
 app.include_router(router)
 
-# Root path (fallback for frontend) last
+# Root route
 @app.get("/")
-def serve_root():
+async def serve_root():
     return FileResponse("static/dist/index.html")
 
+# Catch-all fallback for SPA routes like /home
 @app.get("/{full_path:path}")
 async def spa_fallback(full_path: str):
     return FileResponse("static/dist/index.html")
-
-app.mount("/", StaticFiles(directory="static/dist", html=True), name="static-root")

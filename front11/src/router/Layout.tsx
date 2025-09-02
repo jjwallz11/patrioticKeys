@@ -7,7 +7,7 @@ const Layout = () => {
   return (
     <div className="app-layout">
       <img
-        src={`${import.meta.env.BASE_URL}pkLogo.png?v=2`}
+        src="/static/pkLogo.png?v=3"
         alt="Patriotic Keys Logo"
         className="pk-logo"
         style={{ cursor: "pointer" }}
