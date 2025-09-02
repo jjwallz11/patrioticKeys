@@ -11,6 +11,7 @@ router = APIRouter()
 @router.get("/refresh-token")
 async def refresh_qb_access_token():
     refresh_token = os.getenv("QB_REFRESH_TOKEN")
+    print("🔍 REFRESH TOKEN VALUE:", refresh_token)
     client_id = os.getenv("QB_CLIENT_ID")
     client_secret = os.getenv("QB_CLIENT_SECRET")
 
