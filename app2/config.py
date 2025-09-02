@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     JWT_EXPIRATION_MINUTES: int = 720
 
     # === QuickBooks ===
-    QB_ENVIRONMENT: str = "production"
+    QB_ENVIRONMENT: str = "sandbox"
     
     model_config = ConfigDict(extra="allow")
 
