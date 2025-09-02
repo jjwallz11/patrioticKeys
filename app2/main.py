@@ -41,7 +41,7 @@ async def shutdown_event():
     logging.info("🛑 Patriotic Keys API shutting down")
 
 # Serve assets and other static files from /static/
-app.mount("/static", StaticFiles(directory="static/dist"), name="static")
+app.mount("/", StaticFiles(directory="static/dist", html=True), name="static")
 
 # Include your API routers here
 app.include_router(router)
