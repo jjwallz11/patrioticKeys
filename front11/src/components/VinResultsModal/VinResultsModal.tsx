@@ -31,7 +31,7 @@ const VinResultsModal: React.FC<VinResultsModalProps> = ({
       setChecking(true);
       setError(null);
       try {
-        const res = await csrfFetch(`/api/customers/${customerId}/invoices/today`);
+        const res = await csrfFetch(`/api/qb/customers/${customerId}/invoices/today`);
         if (res.ok) {
           const data = await res.json();
           setInvoiceId(data.invoice_id); // Adjust based on your actual key

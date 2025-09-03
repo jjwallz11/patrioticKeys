@@ -21,7 +21,7 @@ const CreateInvoiceModal = ({
     setError(null);
     try {
       const response = await csrfFetch(
-        `/api/customers/${customerId}/invoices/today`,
+        `/api/qb/customers/${customerId}/invoices/today`,
         {
           method: "POST",
         }
