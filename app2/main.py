@@ -44,7 +44,7 @@ async def shutdown_event():
 app.include_router(router)
 
 # Serve assets and other static files from /static/
-app.mount("/static/dist", StaticFiles(directory="static/dist", html=True), name="static")
+app.mount("/static", StaticFiles(directory="static/dist", html=True), name="static")
 
 # Set the absolute path to index.html
 index_file = Path(__file__).resolve().parent / "static" / "dist" / "index.html"
