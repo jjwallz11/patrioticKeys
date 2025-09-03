@@ -100,7 +100,11 @@ const ScanVinModal = ({
         const lastSix = extractedVin.slice(-6);
         setLastSix(lastSix);
         setVinResult({ ...result, lastSix });
-        openResultsModal();
+
+        // Close scan modal and open results modal
+        onClose(); // closes ScanVinModal
+        openResultsModal(); // opens VinResultsModal
+
         return true;
       } else if (!silent) {
         setVin("No VIN found");
@@ -121,6 +125,11 @@ const ScanVinModal = ({
           <canvas ref={canvasRef} style={{ display: "none" }} />
           {processing && <p>Scanning...</p>}
           {vin && <p>Detected VIN: {vin}</p>}
+          {vin === "No VIN found" && (
+            <button className="btn-cancel" onClick={onClose}>
+              Close
+            </button>
+          )}
         </div>
       </BaseModal>
     </div>
