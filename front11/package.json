@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "build-and-copy": "vite build && cp -r dist ../app2/static",
+    "build-and-copy": "vite build && cp -R dist/* ../app2/static/dist",
     "watch-and-copy": "chokidar \"src/**\" -c \"npm run build-and-copy\""
   },
   "dependencies": {
