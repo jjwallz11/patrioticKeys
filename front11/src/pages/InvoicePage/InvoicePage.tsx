@@ -65,10 +65,10 @@ export default function InvoicePage() {
 
   if (loading) return <div className="p-4">Loading invoice…</div>;
 
-  if (showCreateModal) {
+  if (showCreateModal && selectedCustomer) {
     return (
       <CreateInvoiceModal
-        customerId={"session"}
+        customerId={selectedCustomer?.id}
         onClose={() => {
           setShowCreateModal(false);
           window.location.reload(); // reload to show newly created invoice
