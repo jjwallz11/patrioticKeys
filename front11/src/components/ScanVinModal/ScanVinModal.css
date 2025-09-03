@@ -5,17 +5,3 @@
   height: auto;
   object-fit: cover;
 }
-
-@media (max-width: 768px) {
-  .scan-vin-modal__video {
-    width: 75%;
-    height: auto;
-    object-fit: cover;
-  }
-
-  .scan-vin-modal button {
-    width: 75%;
-    font-size: 1rem;
-    margin: 1rem 0;
-  }
-}
