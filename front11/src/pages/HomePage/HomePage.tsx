@@ -9,6 +9,7 @@ import ChangePasswordModal from "../../components/ChangePasswordModal";
 import { VehicleResponse } from "../../types";
 import { useNavigate } from "react-router-dom";
 import "../../components/ScanVinModal/ScanVinModal.css";
+import "../../components/BaseModal/BaseModal.css"
 
 const HomePage: React.FC = () => {
   const [showAddInvoice, setShowAddInvoice] = useState(false);
