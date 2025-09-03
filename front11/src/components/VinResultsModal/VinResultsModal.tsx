@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { VehicleResponse } from "../../types";
 import csrfFetch from "../../utils/csrf";
 import AddToInvoiceModal from "../AddToInvoiceModal/AddToInvoiceModal";
-import AddOrCreateInvoiceModal from "../AddOrCreateInvoiceModal/AddOrCreateInvoiceModal";
+import AddOrCreateInvoiceModal from "../CreateInvoiceModal/CreateInvoiceModal";
+
 
 interface VinResultsModalProps {
   isOpen: boolean;

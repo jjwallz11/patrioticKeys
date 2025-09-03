@@ -6,7 +6,8 @@ from utils.qb import (
     create_customer,
     get_today_invoice_only,
     create_today_invoice,
-    send_invoice_email
+    send_invoice_email,
+    get_all_invoices_for_customer
 )
 from utils.session import (
     get_session_id,
@@ -127,3 +128,14 @@ async def get_today_invoice(request: Request):
         raise HTTPException(status_code=400, detail="No active customer found in session")
 
     return await get_today_invoice_only(customer_id, qb_access_token, realm_id)
+
+
+@router.get("/customers/{customer_id}/invoices")
+async def get_all_invoices(customer_id: str, request: Request):
+    qb_access_token = request.cookies.get("qb_access_token")
+    realm_id = request.cookies.get("qb_realm_id")
+
+    if not qb_access_token or not realm_id:
+        raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
+
+    return await get_all_invoices_for_customer(customer_id, qb_access_token, realm_id)

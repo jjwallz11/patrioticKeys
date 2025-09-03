@@ -1,18 +1,18 @@
-// front11/src/components/AddOrCreateInvoiceModal/AddOrCreateInvoiceModal.tsx
+// front11/src/components/CreateInvoiceModal/CreateInvoiceModal.tsx
 
 import { useState } from "react";
 import csrfFetch from "../../utils/csrf";
 import BaseModal from "../BaseModal/BaseModal";
 
-interface AddOrCreateInvoiceModalProps {
+interface CreateInvoiceModalProps {
   customerId: string;
   onClose: () => void;
 }
 
-const AddOrCreateInvoiceModal = ({
+const CreateInvoiceModal = ({
   customerId,
   onClose,
-}: AddOrCreateInvoiceModalProps) => {
+}: CreateInvoiceModalProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,8 +28,6 @@ const AddOrCreateInvoiceModal = ({
       );
 
       if (!response.ok) {
-        const invoice = await response.json();
-        console.log("Invoice created or resumed:", invoice);
         const data = await response.json();
         throw new Error(data.detail || "Failed to start invoice");
       }
@@ -44,8 +42,8 @@ const AddOrCreateInvoiceModal = ({
 
   return (
     <BaseModal title="Start Today's Invoice" onClose={onClose}>
-      <div className="addorcreateinvoice-modal__body">
-        <p>Do you want to start or resume today's invoice for this customer?</p>
+      <div className="createinvoice-modal__body">
+        <p>Do you want to start today's invoice for this customer?</p>
         {error && <p className="error-text">{error}</p>}
       </div>
 
@@ -65,4 +63,4 @@ const AddOrCreateInvoiceModal = ({
   );
 };
 
-export default AddOrCreateInvoiceModal;
+export default CreateInvoiceModal;

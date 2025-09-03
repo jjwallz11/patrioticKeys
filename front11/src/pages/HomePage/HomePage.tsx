@@ -1,7 +1,7 @@
 // front11/src/pages/HomePage/HomePage.tsx
 
 import React, { useState } from "react";
-import AddOrCreateInvoiceModal from "../../components/AddOrCreateInvoiceModal";
+import AddOrCreateInvoiceModal from "../../components/CreateInvoiceModal";
 import ScanVinModal from "../../components/ScanVinModal";
 import VinResultsModal from "../../components/VinResultsModal";
 import CustomerSelectModal from "../../components/CustomerSelectModal";
@@ -9,7 +9,7 @@ import ChangePasswordModal from "../../components/ChangePasswordModal";
 import { VehicleResponse } from "../../types";
 import { useNavigate } from "react-router-dom";
 import "../../components/ScanVinModal/ScanVinModal.css";
-import "../../components/BaseModal/BaseModal.css"
+import "../../components/BaseModal/BaseModal.css";
 
 const HomePage: React.FC = () => {
   const [showAddInvoice, setShowAddInvoice] = useState(false);
@@ -31,7 +31,13 @@ const HomePage: React.FC = () => {
         <button onClick={() => setShowAddInvoice(true)}>
           Add or Create Invoice
         </button>
-        <button onClick={() => navigate("/invoice")}>
+        <button
+          onClick={() =>
+            navigate("/invoice", {
+              state: { selectedCustomer }, // pass it directly
+            })
+          }
+        >
           Review & Send Invoice
         </button>
         <button onClick={() => setShowScanVin(true)}>Scan VIN</button>

@@ -218,3 +218,21 @@ async def get_item_id_by_name(name: str, request: Request) -> str:
     if not items:
         raise ValueError(f"QuickBooks item '{name}' not found.")
     return items[0]["Id"]
+
+
+async def get_all_invoices_for_customer(customer_id: str, qb_access_token: str, realm_id: str):
+    q = (
+        "select Id, DocNumber, TxnDate, TotalAmt, Balance, CustomerRef from Invoice "
+        f"where CustomerRef = '{customer_id}' "
+        "order by TxnDate desc"
+    )
+    query_url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
+
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        r = await client.get(query_url, headers=build_qb_headers(qb_access_token))
+    r.raise_for_status()
+
+    print("📄 QuickBooks all invoices query:", q)
+    print("📄 Response:", r.json())
+
+    return r.json().get("QueryResponse", {}).get("Invoice", [])
