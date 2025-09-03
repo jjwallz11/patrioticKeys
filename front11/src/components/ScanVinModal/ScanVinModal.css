@@ -1,7 +1,14 @@
-/* ScanVinModal.css */
+/* front11/src/components/ScanVinModal/ScanVinModal.css */
 
 .scan-vin-modal__video {
-  width: 75%;
-  height: auto;
-  object-fit: cover;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  object-fit: cover !important;
+  border: 8px solid #568ea3 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) !important;
+  background-color: #000 !important;
+  z-index: 10 !important;
+  display: block !important;
 }
