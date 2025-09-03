@@ -117,7 +117,24 @@ async def create_customer(payload: dict, qb_access_token: str, realm_id: str):
     }
 
 
-async def get_or_create_today_invoice(customer_id: str, qb_access_token: str, realm_id: str):
+async def create_today_invoice(customer_id: str, qb_access_token: str, realm_id: str):
+    today = date.today().isoformat()
+    create_url = f"{QB_BASE}/{realm_id}/invoice"
+    payload = {
+        "Line": [],
+        "CustomerRef": {"value": str(customer_id)},
+        "TxnDate": today,
+    }
+
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        r = await client.post(create_url, headers=build_qb_headers(qb_access_token), json=payload)
+    r.raise_for_status()
+
+    inv = r.json().get("Invoice", {})
+    return {"Id": inv.get("Id"), "DocNumber": inv.get("DocNumber")}
+
+
+async def get_today_invoice_only(customer_id: str, qb_access_token: str, realm_id: str):
     today = date.today().isoformat()
     q = (
         "select Id, DocNumber, TxnDate, TotalAmt, Balance from Invoice "
@@ -125,6 +142,7 @@ async def get_or_create_today_invoice(customer_id: str, qb_access_token: str, re
         "order by MetaData.CreateTime desc"
     )
     query_url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
+
     async with httpx.AsyncClient(timeout=20.0) as client:
         r = await client.get(query_url, headers=build_qb_headers(qb_access_token))
     r.raise_for_status()
@@ -137,18 +155,7 @@ async def get_or_create_today_invoice(customer_id: str, qb_access_token: str, re
         r.raise_for_status()
         return r.json().get("Invoice", {})
 
-    # Create new invoice
-    create_url = f"{QB_BASE}/{realm_id}/invoice"
-    payload = {
-        "Line": [],
-        "CustomerRef": {"value": str(customer_id)},
-        "TxnDate": today,
-    }
-    async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.post(create_url, headers=build_qb_headers(qb_access_token), json=payload)
-    r.raise_for_status()
-    inv = r.json().get("Invoice", {})
-    return {"Id": inv.get("Id"), "DocNumber": inv.get("DocNumber")}
+    return None
 
 
 async def append_invoice_line(invoice_id: str, description: str, qty: float, rate: float, item_id: str, qb_access_token: str, realm_id: str):

@@ -62,9 +62,10 @@ const HomePage: React.FC = () => {
         />
       )}
 
-      {showVinResultsModal && vinResult && (
+      {showVinResultsModal && vinResult && selectedCustomer && (
         <VinResultsModal
           vinData={vinResult}
+          customerId={selectedCustomer.id}
           isOpen={showVinResultsModal}
           onClose={() => setShowVinResultsModal(false)}
         />

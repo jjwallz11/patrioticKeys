@@ -2,7 +2,8 @@
 
 from fastapi import HTTPException, Request
 from utils.qb import (
-    get_or_create_today_invoice,
+    get_today_invoice_only,
+    create_today_invoice,
     append_invoice_line,
     get_item_id_by_name,
 )
@@ -21,7 +22,9 @@ async def add_job_to_invoice(
         raise HTTPException(status_code=400, detail="No QuickBooks customer selected.")
 
     item_id = await get_item_id_by_name(item_name, request)
-    invoice = await get_or_create_today_invoice(customer_id, access_token, realm_id)
+    invoice = await get_today_invoice_only(customer_id, access_token, realm_id)
+    if not invoice:
+        invoice = await create_today_invoice(customer_id, access_token, realm_id)
 
     result = await append_invoice_line(
         invoice_id=invoice["Id"],
