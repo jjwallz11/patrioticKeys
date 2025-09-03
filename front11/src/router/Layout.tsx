@@ -1,7 +1,7 @@
 // src/router/layout.tsx
 
 import { Outlet } from "react-router-dom";
-// import "./Layout.css";
+import "./Layout.css";
 
 const Layout = () => {
   return (

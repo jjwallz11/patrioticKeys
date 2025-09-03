@@ -1,6 +1,7 @@
 // src/components/ConfirmationModal/ConfirmationModal.tsx
 
 import { useState, FC } from "react";
+import "./ConfirmationModal.css";
 
 interface ConfirmationModalProps {
   title: string;

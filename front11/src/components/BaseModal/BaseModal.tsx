@@ -1,7 +1,7 @@
 // front11/src/components/BaseModal/BaseModal.tsx
 
 import React from "react";
-// import "./BaseModal.css";
+import "./BaseModal.css";
 
 interface BaseModalProps {
   isOpen?: boolean;

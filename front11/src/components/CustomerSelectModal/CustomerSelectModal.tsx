@@ -6,7 +6,7 @@ import AddCustomerModal from "../AddCustomerModal/AddCustomerModal";
 import ScanVinModal from "../ScanVinModal";
 import csrfFetch from "../../utils/csrf";
 import { VehicleResponse } from "../../types";
-// import "../BaseModal/BaseModal.css";
+import "../BaseModal/BaseModal.css";
 
 interface Customer {
   id: string;
