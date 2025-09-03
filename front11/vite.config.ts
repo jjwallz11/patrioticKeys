@@ -17,5 +17,8 @@ export default defineConfig(({ mode }) => {
     server: {
       open: true,
     },
+    build: {
+      target: 'es2015',
+    }
   };
 });
