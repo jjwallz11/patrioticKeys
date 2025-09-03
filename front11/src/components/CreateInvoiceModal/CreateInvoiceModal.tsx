@@ -7,11 +7,13 @@ import BaseModal from "../BaseModal/BaseModal";
 interface CreateInvoiceModalProps {
   customerId: string;
   onClose: () => void;
+  onInvoiceCreated: (invoiceId: string) => void;
 }
 
 const CreateInvoiceModal = ({
   customerId,
   onClose,
+  onInvoiceCreated,
 }: CreateInvoiceModalProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,11 +34,17 @@ const CreateInvoiceModal = ({
         throw new Error(data.detail || "Failed to start invoice");
       }
 
+      const data = await response.json();
+      const invoiceId = data?.Id || data?.Invoice?.Id;
+
+      if (!invoiceId) {
+        throw new Error("Invoice ID missing from response");
+      }
+
+      onInvoiceCreated(invoiceId);
       onClose();
     } catch (err: any) {
       setError(err.message || "An error occurred.");
-    } finally {
-      setLoading(false);
     }
   };
 

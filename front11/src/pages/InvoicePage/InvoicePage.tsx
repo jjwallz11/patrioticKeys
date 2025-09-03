@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import CompleteInvoiceButton from "../../components/CompleteInvoiceButton";
 import CreateInvoiceModal from "../../components/CreateInvoiceModal";
+import AddToInvoiceModal from "../../components/AddToInvoiceModal/AddToInvoiceModal";
 import csrfFetch from "../../utils/csrf";
 import { useLocation } from "react-router-dom";
 
@@ -29,38 +30,32 @@ export default function InvoicePage() {
     name: string;
   } | null>(null);
   const location = useLocation();
+  const [invoiceId, setInvoiceId] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const vehicleFromNav = location.state?.vehicle;
   const customerFromNav = location.state?.selectedCustomer;
 
   useEffect(() => {
-    const fetchInvoiceAndCustomer = async () => {
-      try {
-        // Fetch invoice
-        const res = await csrfFetch("/api/qb/invoice", {
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error("Failed to load invoice");
-        const data = await res.json();
-        setLines(data.Line || []);
 
-        // Fetch customer info
+    if (customerFromNav) {
+      setSelectedCustomer({
+        id: customerFromNav.id,
+        name: customerFromNav.name || "Unknown Customer",
+      });
+    } else {
+      const fetchCustomer = async () => {
         const resCustomer = await csrfFetch("/api/qb/session-customer", {
           credentials: "include",
         });
-        if (resCustomer.ok) {
-          const customerData = await resCustomer.json();
-          setSelectedCustomer({
-            id: customerData.customer_id,
-            name: customerData.customer_name || "Unknown Customer",
-          });
-        }
-      } catch (err) {
-        setShowCreateModal(true);
-      } finally {
-        setLoading(false);
-      }
-    };
+        const data = await resCustomer.json();
+        setSelectedCustomer({
+          id: data.Id,
+          name: data.DisplayName,
+        });
+      };
 
-    fetchInvoiceAndCustomer();
+      fetchCustomer();
+    }
   }, []);
 
   if (loading) return <div className="p-4">Loading invoice…</div>;
@@ -71,8 +66,24 @@ export default function InvoicePage() {
         customerId={selectedCustomer?.id}
         onClose={() => {
           setShowCreateModal(false);
-          window.location.reload(); // reload to show newly created invoice
+          window.location.reload(); // reload to pull in new invoice
         }}
+        onInvoiceCreated={() => {
+          // Optional: add logic if needed — or leave as no-op
+        }}
+      />
+    );
+  }
+
+  if (showAddModal && invoiceId && vehicleFromNav) {
+    return (
+      <AddToInvoiceModal
+        invoiceId={invoiceId}
+        onClose={() => {
+          setShowAddModal(false);
+          window.location.reload();
+        }}
+        vehicle={vehicleFromNav}
       />
     );
   }

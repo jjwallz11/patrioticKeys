@@ -1,7 +1,7 @@
 // front11/src/pages/HomePage/HomePage.tsx
 
 import React, { useState } from "react";
-import AddOrCreateInvoiceModal from "../../components/CreateInvoiceModal";
+import CreateInvoiceModal from "../../components/CreateInvoiceModal";
 import ScanVinModal from "../../components/ScanVinModal";
 import VinResultsModal from "../../components/VinResultsModal";
 import CustomerSelectModal from "../../components/CustomerSelectModal";
@@ -34,7 +34,7 @@ const HomePage: React.FC = () => {
         <button
           onClick={() =>
             navigate("/invoice", {
-              state: { selectedCustomer }, // pass it directly
+              state: { selectedCustomer, vehicle: vinResult },
             })
           }
         >
@@ -56,9 +56,12 @@ const HomePage: React.FC = () => {
       )}
 
       {showAddInvoice && selectedCustomer && (
-        <AddOrCreateInvoiceModal
+        <CreateInvoiceModal
           customerId={selectedCustomer.id}
           onClose={() => setShowAddInvoice(false)}
+          onInvoiceCreated={() => {
+            // Optional: handle it if needed
+          }}
         />
       )}
       {showScanVin && (
