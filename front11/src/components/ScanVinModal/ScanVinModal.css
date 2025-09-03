@@ -1,25 +1,13 @@
 /* ScanVinModal.css */
 
-.scan-vin-modal {
-  width: 75vw;
+.scan-vin-modal__video {
+  width: 75%;
   height: auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: white;
+  object-fit: cover;
 }
 
-/* Mobile-only styles */
 @media (max-width: 768px) {
-  .scan-vin-modal {
-    width: 75vw;
-    height: 75vh;
-    padding: 0;
-    border-radius: 0;
-  }
-
-  .scan-vin-modal video {
+  .scan-vin-modal__video {
     width: 75%;
     height: auto;
     object-fit: cover;
