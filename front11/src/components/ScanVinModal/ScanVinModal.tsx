@@ -4,6 +4,8 @@ import { useRef, useState, useEffect } from "react";
 import Tesseract from "tesseract.js";
 import { VehicleResponse } from "../../types";
 import csrfFetch from "../../utils/csrf";
+import BaseModal from "../BaseModal/BaseModal";
+import "./ScanVinModal.css";
 
 type ScanVinModalProps = {
   onClose: () => void;
@@ -112,15 +114,15 @@ const ScanVinModal = ({
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h2>Scan VIN</h2>
-        <video ref={videoRef} className="video-preview" />
-        <canvas ref={canvasRef} style={{ display: "none" }} />
-        {processing && <p>Scanning...</p>}
-        {vin && <p>Detected VIN: {vin}</p>}
-        <button onClick={onClose}>Close</button>
-      </div>
+    <div className="modal scan-vin-modal">
+      <BaseModal title="Scan VIN" onClose={onClose} showButtons={false}>
+        <div className="scan-vin-modal__video-wrapper">
+          <video ref={videoRef} className="scan-vin-modal__video" />
+          <canvas ref={canvasRef} style={{ display: "none" }} />
+          {processing && <p>Scanning...</p>}
+          {vin && <p>Detected VIN: {vin}</p>}
+        </div>
+      </BaseModal>
     </div>
   );
 };
