@@ -138,7 +138,8 @@ async def get_today_invoice_only(customer_id: str, qb_access_token: str, realm_i
     today = date.today().isoformat()
     q = (
         "select Id, DocNumber, TxnDate, TotalAmt, Balance from Invoice "
-        f"where CustomerRef = '{customer_id}' and TxnDate = '{today}' and PrivateNote != 'CLOSED' "
+        f"where TxnDate = '{today}' "
+        f"and CustomerRef = '{customer_id}' "
         "order by MetaData.CreateTime desc"
     )
     query_url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
