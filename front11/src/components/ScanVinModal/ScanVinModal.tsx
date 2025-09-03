@@ -117,7 +117,7 @@ const ScanVinModal = ({
     <div className="modal scan-vin-modal">
       <BaseModal title="Scan VIN" onClose={onClose} showButtons={false}>
         <div className="scan-vin-modal__video-wrapper">
-          <video ref={videoRef} className="scan-vin-modal__video" style={{ border: "25px solid red", width: "300px"}} />
+          <video ref={videoRef} className="scan-vin-modal__video" />
           <canvas ref={canvasRef} style={{ display: "none" }} />
           {processing && <p>Scanning...</p>}
           {vin && <p>Detected VIN: {vin}</p>}
