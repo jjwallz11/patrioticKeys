@@ -6,7 +6,7 @@ import { RouterProvider } from "react-router-dom";
 import { router } from "./router";
 import { ModalProvider } from "./context/Modal";
 import { AuthProvider } from "./context/Auth";
-// import './index.css';
+import './index.css';
 
 if (
   import.meta.env.MODE === "production" &&
