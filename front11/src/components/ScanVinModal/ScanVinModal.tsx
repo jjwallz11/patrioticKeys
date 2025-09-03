@@ -5,7 +5,7 @@ import Tesseract from "tesseract.js";
 import { VehicleResponse } from "../../types";
 import csrfFetch from "../../utils/csrf";
 import BaseModal from "../BaseModal/BaseModal";
-import "./ScanVinModal.css";
+// import "./ScanVinModal.css";
 
 type ScanVinModalProps = {
   onClose: () => void;

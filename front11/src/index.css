@@ -1,0 +1,295 @@
+/* front11/src/index.css */
+
+/* LAYOUT CSS from front11/src/router/Layout.css */
+
+.app-layout {
+  background-color: #fff;
+  color: #072460;
+  min-height: 100vh;
+  font-family: sans-serif;
+}
+
+.app-header {
+  background-color: #072460;
+  color: #ffffff;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.app-main {
+  padding: 2rem;
+}
+
+.pk-logo {
+  width: 300px;
+}
+
+video {
+  max-width: 50%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* LOGIN CSS from front11/src/pages/LoginPage/LoginPage.css */
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 20%;
+}
+
+.login-form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+  width: 300px;
+}
+
+.login-form label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #072460; /* Patriotic Blue */
+  font-weight: bold;
+}
+
+.login-form input[type="email"],
+.login-form input[type="password"] {
+  width: 60%;
+  padding: 0.5rem;
+  border: 2px solid #ae2335; /* Patriotic Red */
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ae2335;
+  font-weight: bold;
+}
+
+button[type="submit"] {
+  background-color: #072460;
+  color: white;
+  font-weight: bold;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #0A3161; /* Old Glory Blue */
+}
+
+/* SCAN VIN MODAL CSS from front11/src/components/ScanVinModal/ScanVinModal.css */
+
+.scan-vin-modal__video {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  object-fit: cover !important;
+  border: 8px solid #568ea3 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) !important;
+  background-color: #000 !important;
+  z-index: 10 !important;
+  display: block !important;
+}
+
+/* CONFIRMATION MODAL CSS from front11/src/components/ConfirmationModal/ConfirmationModal.css */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(7, 36, 96, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  border: 2px solid #072460;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  padding: 24px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  font-family: sans-serif;
+}
+
+.modal-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #072460;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.modal-message {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.password-input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.confirm-btn,
+.cancel-btn {
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.confirm-btn {
+  background-color: #072460; /* Patriotic Blue */
+}
+
+.confirm-btn:hover {
+  background-color: #0A3161; /* Old Glory Blue */
+}
+
+.cancel-btn {
+  background-color: #AE2335; /* Patriotic Red */
+}
+
+.cancel-btn:hover {
+  background-color: #B31942; /* Old Glory Red */
+}
+
+/* BASE MODAL CSS from front11/src/components/BaseModal/BaseModal.css */
+
+.base-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.base-modal__card {
+  width: 90%;
+  max-width: 500px;
+  background-color: #ffffff; /* White */
+  border: 5px solid #000; /* Black outline */
+  border-radius: 10px;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+  max-height: 50%;
+  overflow-y: auto;
+}
+
+.base-modal__header {
+  background-color: #072460; /* Patriotic Blue */
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 15px;
+}
+
+.base-modal__body {
+  background-color: #ffffff; /* White */
+  color: #072460; /* Patriotic Blue */
+  font-weight: 600;
+  padding: 20px;
+}
+
+.base-modal__actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 0 20px 20px;
+  margin-top: 10px;
+}
+
+.btn-edit,
+.btn-delete {
+  font-size: 1.2rem;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.btn-edit {
+  background-color: #072460; /* Patriotic Blue */
+  color: #ffffff;
+}
+.btn-edit:hover {
+  transform: scale(1.05);
+  background-color: #0A3161; /* Old Glory Blue */
+}
+
+.btn-delete {
+  background-color: #ae2335; /* Patriotic Red */
+  color: #ffffff;
+}
+.btn-delete:hover {
+  transform: scale(1.05);
+  background-color: #b31942; /* Old Glory Red */
+}
+
+.base-modal__body input,
+.base-modal__body textarea {
+  width: 95%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 2px solid #072460;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #ffffff;
+  color: #072460;
+  font-weight: 600;
+}
+
+.star-select-row {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.star-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}

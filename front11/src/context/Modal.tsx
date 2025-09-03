@@ -1,6 +1,5 @@
 import { useRef, useState, useContext, createContext, ReactNode, MutableRefObject } from 'react';
 import ReactDOM from 'react-dom';
-import './Modal.css';
 
 // Define the shape of the modal context
 interface ModalContextType {
