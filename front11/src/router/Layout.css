@@ -23,3 +23,10 @@
 .pk-logo {
   width: 300px;
 }
+
+video {
+  max-width: 50%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
