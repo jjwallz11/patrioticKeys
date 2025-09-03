@@ -1,6 +1,6 @@
 /* ScanVinModal.css */
 
-.scan-vin-modal .scan-vin-modal__video {
+.scan-vin-modal__video {
   width: 75%;
   height: auto;
   object-fit: cover;
