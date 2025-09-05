@@ -23,10 +23,18 @@ const ItemSelectModal = ({ onClose, onItemSelect }: ItemSelectModalProps) => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const res = await csrfFetch("/api/qb/items", { credentials: "include" });
+        const res = await csrfFetch("/api/qb/items", {
+          credentials: "include",
+        });
         if (!res.ok) throw new Error("Failed to load items");
         const data = await res.json();
-        setItems(data.items || []);
+        setItems(
+          (data.items || []).map((item: any) => ({
+            id: item.Id,
+            name: item.Name,
+            description: item.Description,
+          }))
+        );
       } catch (err: any) {
         setError(err.message || "Error loading items");
       } finally {
