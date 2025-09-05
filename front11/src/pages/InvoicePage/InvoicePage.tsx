@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import CompleteInvoiceButton from "../../components/CompleteInvoiceButton";
-import CreateInvoiceModal from "../../components/CreateInvoiceModal";
 import AddToInvoiceModal from "../../components/AddToInvoiceModal/AddToInvoiceModal";
 import csrfFetch from "../../utils/csrf";
 import { useLocation } from "react-router-dom";
@@ -12,6 +11,7 @@ type InvoiceLine = {
   Description: string;
   Amount: number;
   DetailType: string;
+  customerId: string;
   SalesItemLineDetail?: {
     ItemRef: {
       name: string;
@@ -60,25 +60,12 @@ export default function InvoicePage() {
 
   if (loading) return <div className="p-4">Loading invoice…</div>;
 
-  if (showCreateModal && selectedCustomer) {
-    return (
-      <CreateInvoiceModal
-        customerId={selectedCustomer?.id}
-        onClose={() => {
-          setShowCreateModal(false);
-          window.location.reload(); // reload to pull in new invoice
-        }}
-        onInvoiceCreated={() => {
-          // Optional: add logic if needed — or leave as no-op
-        }}
-      />
-    );
-  }
 
   if (showAddModal && invoiceId && vehicleFromNav) {
     return (
       <AddToInvoiceModal
         invoiceId={invoiceId}
+        customerId={customerFromNav}
         onClose={() => {
           setShowAddModal(false);
           window.location.reload();

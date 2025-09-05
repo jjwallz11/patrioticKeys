@@ -8,8 +8,8 @@ import { VehicleResponse } from "../../types";
 
 interface AddToInvoiceModalProps {
   vehicle: VehicleResponse;
-  invoiceId?: string; // <-- made optional
-  customerId: string; // <-- added
+  invoiceId?: string;
+  customerId: string;
   onClose: () => void;
   onSuccess?: (newInvoiceId?: string) => void;
 }
@@ -51,7 +51,7 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
       let res;
 
       if (invoiceId) {
-        // 🔁 Add to existing invoice
+      
         res = await csrfFetch("/api/invoices/items", {
           method: "POST",
           body: JSON.stringify({
@@ -68,7 +68,7 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
         onSuccess?.();
         onClose();
       } else {
-        // 🆕 Create new invoice with line item
+        
         res = await csrfFetch(`/api/qb/customers/${customerId}/invoices/today`, {
           method: "POST",
           body: JSON.stringify({

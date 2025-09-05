@@ -108,7 +108,7 @@ const VinResultsModal: React.FC<VinResultsModalProps> = ({
       {showAddToInvoice && (
         <AddToInvoiceModal
           vehicle={vinData}
-          invoiceId={invoiceId ?? undefined} // undefined triggers creation mode
+          invoiceId={invoiceId ?? undefined}
           customerId={customerId}
           onClose={() => setShowAddToInvoice(false)}
           onSuccess={(newId) => {
