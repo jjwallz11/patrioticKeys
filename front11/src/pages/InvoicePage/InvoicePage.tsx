@@ -36,7 +36,6 @@ export default function InvoicePage() {
   const customerFromNav = location.state?.selectedCustomer;
 
   useEffect(() => {
-
     if (customerFromNav) {
       setSelectedCustomer({
         id: customerFromNav.id,
@@ -58,14 +57,35 @@ export default function InvoicePage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!selectedCustomer) return;
+
+    const fetchInvoice = async () => {
+      try {
+        const res = await csrfFetch("/api/qb/invoice/current", {
+          credentials: "include",
+        });
+        const data = await res.json();
+
+        setLines(data.Line || []);
+        setInvoiceId(data.Id);
+      } catch (err) {
+        console.error("Failed to load invoice", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInvoice();
+  }, [selectedCustomer]);
+
   if (loading) return <div className="p-4">Loading invoice…</div>;
 
-
-  if (showAddModal && invoiceId && vehicleFromNav) {
+  if ((showAddModal || vehicleFromNav) && invoiceId && selectedCustomer && vehicleFromNav) {
     return (
       <AddToInvoiceModal
         invoiceId={invoiceId}
-        customerId={customerFromNav}
+        customerId={selectedCustomer?.id}
         onClose={() => {
           setShowAddModal(false);
           window.location.reload();
