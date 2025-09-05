@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
+from fastapi.responses import JSONResponse
 from starlette.responses import RedirectResponse
 import os
 import urllib.parse
@@ -9,8 +10,8 @@ router = APIRouter()
 
 
 @router.get("/refresh-token")
-async def refresh_qb_access_token():
-    refresh_token = os.getenv("QB_REFRESH_TOKEN")
+async def refresh_qb_access_token(request: Request):
+    refresh_token = request.cookies.get("qb_refresh_token")
     print("🔍 REFRESH TOKEN VALUE:", refresh_token)
     client_id = os.getenv("QB_CLIENT_ID")
     client_secret = os.getenv("QB_CLIENT_SECRET")
@@ -42,17 +43,14 @@ async def refresh_qb_access_token():
         raise HTTPException(status_code=500, detail=f"Refresh failed: {response.text}")
 
     token_data = response.json()
+
     new_qb_access_token = token_data["access_token"]
     new_refresh_token = token_data["refresh_token"]
 
-    # Optional: Log or store these securely
-    print("🆕 ACCESS TOKEN:", new_qb_access_token)
-    print("🆕 REFRESH TOKEN:", new_refresh_token)
-
-    return {
-        "access_token": new_qb_access_token,
-        "refresh_token": new_refresh_token
-    }
+    response = JSONResponse(content={"message": "Tokens refreshed."})
+    response.set_cookie("qb_access_token", new_qb_access_token, httponly=True)
+    response.set_cookie("qb_refresh_token", new_refresh_token, httponly=True)
+    return response
     
     
 @router.get("/connect-to-qb")

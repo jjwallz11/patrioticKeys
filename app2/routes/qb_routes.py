@@ -7,7 +7,8 @@ from utils.qb import (
     get_today_invoice_only,
     create_today_invoice,
     send_invoice_email,
-    get_all_invoices_for_customer
+    get_all_invoices_for_customer,
+    get_all_qb_items
 )
 from utils.session import (
     get_session_id,
@@ -73,7 +74,7 @@ async def add_invoice_item(payload: dict = Body(...), request: Request = None):
         description=payload["description"],
         qty=payload.get("qty", 1),
         rate=payload.get("rate", 0),
-        item_name=payload["item_id"],
+        item_name=payload["item_name"],
         request=request
     )
 

@@ -45,7 +45,7 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
         body: JSON.stringify({
           vin: vehicle.vin,
           invoice_id: invoiceId,
-          item_id: selectedItem.id,
+          item_name: selectedItem.name,
           description,
         }),
       });
@@ -73,7 +73,7 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
 
         {selectedItem && (
           <p style={{ marginTop: "0.5rem" }}>
-            Selected Item ID: <code>{selectedItem.id}</code>
+            Selected Item & ID: <code>{selectedItem.name};{selectedItem.id}</code>
           </p>
         )}
 

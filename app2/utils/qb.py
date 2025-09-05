@@ -81,10 +81,9 @@ async def search_customers(qb_access_token: str, realm_id: str) -> list[dict]:
             return []
 
 
-async def get_customer_by_id(customer_id: str, qb_access_token: str, realm_id: str):
+async def get_customer_by_id(customer_id: str, qb_access_token: str, realm_id: str, request: Request):
     url = f"{QB_BASE}/{realm_id}/customer/{customer_id}"
-    async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.get(url, headers=build_qb_headers(qb_access_token))
+    r = await safe_qb_request("GET", url, request, headers=build_qb_headers(qb_access_token))
     r.raise_for_status()
     c = r.json().get("Customer", {})
     return {
@@ -199,11 +198,10 @@ async def send_invoice_email(invoice_id: str, qb_access_token: str, realm_id: st
     return r.json()
 
 
-async def get_all_qb_items(qb_access_token: str, realm_id: str):
+async def get_all_qb_items(qb_access_token: str, realm_id: str, request: Request):
     q = "select Id, Name from Item"
     url = f"{QB_BASE}/{realm_id}/query?query={quote(q)}"
-    async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.get(url, headers=build_qb_headers(qb_access_token))
+    r = await safe_qb_request("GET", url, request, headers=build_qb_headers(qb_access_token))
     r.raise_for_status()
     return r.json().get("QueryResponse", {}).get("Item", [])
 
@@ -237,3 +235,44 @@ async def get_all_invoices_for_customer(customer_id: str, qb_access_token: str, 
     print("📄 Response:", r.json())
 
     return r.json().get("QueryResponse", {}).get("Invoice", [])
+
+
+async def safe_qb_request(
+    method: str,
+    url: str,
+    request: Request,
+    headers: dict = None,
+    data=None,
+    json=None,
+    params=None
+):
+    if headers is None:
+        headers = {}
+
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        response = await client.request(method, url, headers=headers, data=data, json=json, params=params)
+
+        # Success — return response
+        if response.status_code < 400:
+            return response
+
+        # Handle token expiration
+        if response.status_code == 401:
+            error = response.json().get("error_description", "")
+            print("🔴 QuickBooks error:", error)
+
+            if "token expired" in error.lower():
+                # access token expired → refresh and retry
+                await client.get("http://localhost:8000/api/qb-auth/refresh-token", cookies=request.cookies)
+                response = await client.request(method, url, headers=headers, data=data, json=json, params=params)
+                if response.status_code < 400:
+                    return response
+
+            elif "invalid grant" in error.lower():
+                raise HTTPException(
+                    status_code=401,
+                    detail="QuickBooks refresh token is invalid or expired. Please reconnect via /connect-to-qb."
+                )
+
+        # Still bad? Raise it
+        response.raise_for_status()
