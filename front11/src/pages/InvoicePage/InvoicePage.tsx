@@ -22,7 +22,6 @@ type InvoiceLine = {
 export default function InvoicePage() {
   const [lines, setLines] = useState<InvoiceLine[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<{
     id: string;
     name: string;
@@ -30,6 +29,11 @@ export default function InvoicePage() {
   const location = useLocation();
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [invoiceMeta, setInvoiceMeta] = useState<{
+    docNumber: string;
+    txnDate: string;
+    totalAmt: number;
+  } | null>(null);
   const vehicleFromNav = location.state?.vehicle;
   const customerFromNav = location.state?.selectedCustomer;
 
@@ -67,6 +71,12 @@ export default function InvoicePage() {
 
         setLines(data.Line || []);
         setInvoiceId(data.Id);
+
+        setInvoiceMeta({
+          docNumber: data.DocNumber,
+          txnDate: data.TxnDate,
+          totalAmt: data.TotalAmt,
+        });
       } catch (err) {
         console.error("Failed to load invoice", err);
       } finally {
@@ -79,7 +89,12 @@ export default function InvoicePage() {
 
   if (loading) return <div className="p-4">Loading invoice…</div>;
 
-  if ((showAddModal || vehicleFromNav) && invoiceId && selectedCustomer && vehicleFromNav) {
+  if (
+    (showAddModal || vehicleFromNav) &&
+    invoiceId &&
+    selectedCustomer &&
+    vehicleFromNav
+  ) {
     return (
       <AddToInvoiceModal
         invoiceId={invoiceId}
@@ -95,24 +110,45 @@ export default function InvoicePage() {
 
   return (
     <div>
-      <h1>Current Invoice</h1>
+      <h1 className="text-2xl font-bold mb-2">Current Invoice</h1>
+      {invoiceMeta && (
+        <div className="mb-4 text-sm text-gray-700">
+          <p>
+            Invoice #: <strong>{invoiceMeta.docNumber}</strong>
+          </p>
+          <p>Date: {new Date(invoiceMeta.txnDate).toLocaleDateString()}</p>
+        </div>
+      )}
       {selectedCustomer && (
         <p className="mb-2 font-semibold">
           Selected Customer: {selectedCustomer.name} (ID: {selectedCustomer.id})
         </p>
       )}
       {lines.map((line) => (
-        <div key={line.Id}>
-          <p>{line.SalesItemLineDetail?.ItemRef?.name || "Unnamed Item"}</p>
-          <p>{line.Description}</p>
+        <div
+          key={line.Id}
+          className="mb-4 p-3 border rounded bg-white shadow-sm"
+        >
+          <p className="font-semibold text-lg">
+            {line.SalesItemLineDetail?.ItemRef?.name || "Unnamed Item"}
+          </p>
+          <p className="text-sm text-gray-600 italic mb-1">
+            {line.Description}
+          </p>
           <p>
             Qty: {line.SalesItemLineDetail?.Qty} × $
             {line.SalesItemLineDetail?.UnitPrice?.toFixed(2)}
           </p>
-          <p>Total: ${line.Amount?.toFixed(2)}</p>
+          <p className="font-bold">Total: ${line.Amount?.toFixed(2)}</p>
         </div>
       ))}
 
+      {invoiceMeta && (
+        <div className="mt-6 text-right font-bold text-xl">
+          Invoice Total: ${invoiceMeta.totalAmt.toFixed(2)}
+        </div>
+      )}
+      
       <CompleteInvoiceButton />
     </div>
   );
