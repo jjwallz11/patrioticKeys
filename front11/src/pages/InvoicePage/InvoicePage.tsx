@@ -59,33 +59,31 @@ export default function InvoicePage() {
     }
   }, []);
 
-  useEffect(() => {
+  const fetchInvoice = async () => {
     if (!selectedCustomer) return;
 
-    const fetchInvoice = async () => {
-      try {
-        const res = await csrfFetch("/api/qb/invoice/current", {
+    try {
+      const res = await csrfFetch(
+        `/api/qb/customers/${selectedCustomer.id}/invoices/today`,
+        {
           credentials: "include",
-        });
-        const data = await res.json();
+        }
+      );
+      const data = await res.json();
 
-        setLines(data.Line || []);
-        setInvoiceId(data.Id);
-
-        setInvoiceMeta({
-          docNumber: data.DocNumber,
-          txnDate: data.TxnDate,
-          totalAmt: data.TotalAmt,
-        });
-      } catch (err) {
-        console.error("Failed to load invoice", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInvoice();
-  }, [selectedCustomer]);
+      setLines(data.Line || []);
+      setInvoiceId(data.Id);
+      setInvoiceMeta({
+        docNumber: data.DocNumber,
+        txnDate: data.TxnDate,
+        totalAmt: data.TotalAmt,
+      });
+    } catch (err) {
+      console.error("Failed to load today's invoice", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) return <div className="p-4">Loading invoice…</div>;
 
@@ -148,7 +146,7 @@ export default function InvoicePage() {
           Invoice Total: ${invoiceMeta.totalAmt.toFixed(2)}
         </div>
       )}
-      
+
       <CompleteInvoiceButton />
     </div>
   );
