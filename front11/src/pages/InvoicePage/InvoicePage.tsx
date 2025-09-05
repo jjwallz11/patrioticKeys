@@ -59,6 +59,12 @@ export default function InvoicePage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (selectedCustomer) {
+      fetchInvoice();
+    }
+  }, [selectedCustomer]);
+
   const fetchInvoice = async () => {
     if (!selectedCustomer) return;
 
