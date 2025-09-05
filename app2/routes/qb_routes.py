@@ -9,6 +9,7 @@ from utils.qb import (
     create_today_invoice,
     send_invoice_email,
     get_all_invoices_for_customer,
+    get_all_qb_items
 )
 from utils.session import (
     get_session_id,
@@ -98,6 +99,19 @@ async def create_today_invoice_route(
         rate=rate,
         qty=qty
     )
+
+# Get all items (to choose from)
+@router.get("/items")
+async def get_items(request: Request):
+    qb_access_token = request.cookies.get("qb_access_token")
+    realm_id = request.cookies.get("qb_realm_id")
+
+    if not qb_access_token or not realm_id:
+        raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
+
+    items = await get_all_qb_items(qb_access_token, realm_id, request)
+    return {"items": items}
+
 
 # Add job line item to current invoice
 @router.post("/invoices/items")
