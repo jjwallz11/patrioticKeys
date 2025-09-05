@@ -10,8 +10,6 @@ type InvoiceLine = {
   Id: string;
   Description: string;
   Amount: number;
-  DetailType: string;
-  customerId: string;
   SalesItemLineDetail?: {
     ItemRef: {
       name: string;
