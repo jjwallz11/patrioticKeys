@@ -1,6 +1,7 @@
 # app2/routes/qb_routes.py
 
 from fastapi import APIRouter, Request, Body, HTTPException
+import re
 from utils.qb import (
     search_customers,
     create_customer,
@@ -8,7 +9,6 @@ from utils.qb import (
     create_today_invoice,
     send_invoice_email,
     get_all_invoices_for_customer,
-    get_all_qb_items
 )
 from utils.session import (
     get_session_id,
@@ -54,16 +54,30 @@ async def check_today_invoice(customer_id: str, request: Request):
 
     return await get_today_invoice_only(customer_id, qb_access_token, realm_id)
 
+
 @router.post("/customers/{customer_id}/invoices/today")
 async def create_today_invoice_route(customer_id: str, request: Request):
     verify_csrf(request)
-    set_current_qb_customer(customer_id, request)
 
     qb_access_token = request.cookies.get("qb_access_token")
     realm_id = request.cookies.get("qb_realm_id")
 
     if not qb_access_token or not realm_id:
         raise HTTPException(status_code=401, detail="Missing QuickBooks credentials")
+
+    # ✅ Defensive pattern check — QB IDs are usually numeric but might be alphanumeric in future
+    qb_id_pattern = re.compile(r"^[a-zA-Z0-9\-]+$")  # basic validation
+    if not qb_id_pattern.match(customer_id):
+        raise HTTPException(status_code=400, detail="Invalid QuickBooks customer ID format")
+
+    # ✅ Optionally: validate that this ID exists in QuickBooks
+    customers = await search_customers(qb_access_token, realm_id)
+    matching_customer = next((c for c in customers if c["Id"] == customer_id), None)
+    if not matching_customer:
+        raise HTTPException(status_code=404, detail="Customer ID not found in QuickBooks")
+
+    # ✅ Safe to proceed
+    set_current_qb_customer(customer_id, request)
 
     return await create_today_invoice(customer_id, qb_access_token, realm_id)
 
