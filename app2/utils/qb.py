@@ -116,17 +116,41 @@ async def create_customer(payload: dict, qb_access_token: str, realm_id: str):
     }
 
 
-async def create_today_invoice(customer_id: str, qb_access_token: str, realm_id: str):
+async def create_today_invoice(
+    customer_id: str,
+    qb_access_token: str,
+    realm_id: str,
+    item_id: str,
+    description: str = "",
+    rate: float = 0.0,
+    qty: int = 1
+):
     today = date.today().isoformat()
     create_url = f"{QB_BASE}/{realm_id}/invoice"
+
     payload = {
-        "Line": [],
+        "Line": [
+            {
+                "DetailType": "SalesItemLineDetail",
+                "Amount": round(rate * qty, 2),
+                "Description": description,
+                "SalesItemLineDetail": {
+                    "ItemRef": {"value": str(item_id)},
+                    "Qty": qty,
+                    "UnitPrice": rate
+                },
+            }
+        ],
         "CustomerRef": {"value": str(customer_id)},
         "TxnDate": today,
     }
 
     async with httpx.AsyncClient(timeout=20.0) as client:
-        r = await client.post(create_url, headers=build_qb_headers(qb_access_token), json=payload)
+        r = await client.post(
+            create_url,
+            headers=build_qb_headers(qb_access_token),
+            json=payload
+        )
     r.raise_for_status()
 
     inv = r.json().get("Invoice", {})

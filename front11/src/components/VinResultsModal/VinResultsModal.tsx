@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { VehicleResponse } from "../../types";
 import csrfFetch from "../../utils/csrf";
 import AddToInvoiceModal from "../AddToInvoiceModal/AddToInvoiceModal";
-import CreateInvoiceModal from "../CreateInvoiceModal/CreateInvoiceModal";
 
 interface VinResultsModalProps {
   isOpen: boolean;
@@ -23,7 +22,6 @@ const VinResultsModal: React.FC<VinResultsModalProps> = ({
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddToInvoice, setShowAddToInvoice] = useState(false);
-  const [showCreateInvoice, setShowCreateInvoice] = useState(false);
 
   useEffect(() => {
     const checkInvoice = async () => {
@@ -53,11 +51,7 @@ const VinResultsModal: React.FC<VinResultsModalProps> = ({
 
   if (!isOpen || !vinData) return null;
 
-  const handleStartInvoice = () => {
-    setShowCreateInvoice(true);
-  };
-
-  const handleAddToInvoice = () => {
+  const handleOpenModal = () => {
     setShowAddToInvoice(true);
   };
 
@@ -97,13 +91,9 @@ const VinResultsModal: React.FC<VinResultsModalProps> = ({
             <p>Checking for invoice...</p>
           ) : error ? (
             <p className="error-text">{error}</p>
-          ) : invoiceId ? (
-            <button className="btn-edit" onClick={handleAddToInvoice}>
-              Add to Invoice
-            </button>
           ) : (
-            <button className="btn-edit" onClick={handleStartInvoice}>
-              Create Invoice
+            <button className="btn-edit" onClick={handleOpenModal}>
+              {invoiceId ? "Add to Invoice" : "Create Invoice"}
             </button>
           )}
 
@@ -115,23 +105,16 @@ const VinResultsModal: React.FC<VinResultsModalProps> = ({
         </div>
       </div>
 
-      {showCreateInvoice && (
-        <CreateInvoiceModal
-          customerId={customerId}
-          onClose={() => setShowCreateInvoice(false)}
-          onInvoiceCreated={(newId) => {
-            setInvoiceId(newId); // 👈 update state with real invoice ID
-            setShowCreateInvoice(false);
-            setShowAddToInvoice(true); // 👈 optionally open AddToInvoiceModal directly
-          }}
-        />
-      )}
-
-      {showAddToInvoice && invoiceId && (
+      {showAddToInvoice && (
         <AddToInvoiceModal
           vehicle={vinData}
-          invoiceId={invoiceId}
+          invoiceId={invoiceId ?? undefined} // undefined triggers creation mode
+          customerId={customerId}
           onClose={() => setShowAddToInvoice(false)}
+          onSuccess={(newId) => {
+            if (newId) setInvoiceId(newId);
+            setShowAddToInvoice(false);
+          }}
         />
       )}
     </>

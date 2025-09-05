@@ -8,14 +8,16 @@ import { VehicleResponse } from "../../types";
 
 interface AddToInvoiceModalProps {
   vehicle: VehicleResponse;
-  invoiceId: string;
+  invoiceId?: string; // <-- made optional
+  customerId: string; // <-- added
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (newInvoiceId?: string) => void;
 }
 
 const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
   vehicle,
   invoiceId,
+  customerId,
   onClose,
   onSuccess,
 }) => {
@@ -24,6 +26,11 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
     name: string;
   } | null>(null);
   const [showItemSelect, setShowItemSelect] = useState(false);
+  const [description, setDescription] = useState("");
+  const [rate, setRate] = useState<number>(0);
+  const [qty, setQty] = useState<number>(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const getFormattedDescription = (itemName: string) => {
     return `**${itemName}**\n${vehicle.year || "Unknown"} ${
@@ -31,38 +38,70 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
     } ${vehicle.model || "Unknown"} (…${vehicle.vin?.slice(-6) || "XXXXXX"})`;
   };
 
-  const [description, setDescription] = useState("");
-
   const handleSubmit = async () => {
     if (!selectedItem) {
       alert("Please select an item.");
       return;
     }
 
+    setLoading(true);
+    setError(null);
+
     try {
-      const res = await csrfFetch("/api/invoices/items", {
-        method: "POST",
-        body: JSON.stringify({
-          vin: vehicle.vin,
-          invoice_id: invoiceId,
-          item_name: selectedItem.name,
-          description,
-        }),
-      });
+      let res;
 
-      if (!res.ok) throw new Error("Failed to add item to invoice");
+      if (invoiceId) {
+        // 🔁 Add to existing invoice
+        res = await csrfFetch("/api/invoices/items", {
+          method: "POST",
+          body: JSON.stringify({
+            vin: vehicle.vin,
+            invoice_id: invoiceId,
+            item_name: selectedItem.name,
+            description,
+            rate,
+            qty,
+          }),
+        });
 
-      onSuccess?.();
-      onClose();
-    } catch (err) {
+        if (!res.ok) throw new Error("Failed to add item to invoice");
+        onSuccess?.();
+        onClose();
+      } else {
+        // 🆕 Create new invoice with line item
+        res = await csrfFetch(`/api/qb/customers/${customerId}/invoices/today`, {
+          method: "POST",
+          body: JSON.stringify({
+            item_id: selectedItem.id,
+            description,
+            rate,
+            qty,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data?.Id) throw new Error(data?.detail || "Invoice creation failed");
+
+        onSuccess?.(data.Id);
+        onClose();
+      }
+    } catch (err: any) {
       console.error(err);
-      alert("Error adding item to invoice.");
+      setError(err.message || "An error occurred.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <BaseModal title="Add Line Item" onClose={onClose} onSave={handleSubmit}>
+      <BaseModal
+        title={invoiceId ? "Add Line Item" : "Create Invoice"}
+        onClose={onClose}
+        onSave={handleSubmit}
+      >
+        {error && <p className="error-text">{error}</p>}
+
         <p>
           <strong>VIN:</strong> {vehicle.vin}
         </p>
@@ -77,6 +116,21 @@ const AddToInvoiceModal: React.FC<AddToInvoiceModalProps> = ({
           </p>
         )}
 
+        <label>Rate ($):</label>
+        <input
+          type="number"
+          value={rate}
+          onChange={(e) => setRate(parseFloat(e.target.value))}
+        />
+
+        <label>Quantity:</label>
+        <input
+          type="number"
+          value={qty}
+          onChange={(e) => setQty(parseInt(e.target.value))}
+        />
+
+        <label>Description:</label>
         <textarea
           placeholder="Optional Description"
           value={description}

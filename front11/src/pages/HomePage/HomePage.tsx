@@ -1,7 +1,6 @@
 // front11/src/pages/HomePage/HomePage.tsx
 
 import React, { useState } from "react";
-import CreateInvoiceModal from "../../components/CreateInvoiceModal";
 import ScanVinModal from "../../components/ScanVinModal";
 import VinResultsModal from "../../components/VinResultsModal";
 import CustomerSelectModal from "../../components/CustomerSelectModal";
@@ -12,7 +11,6 @@ import "../../components/ScanVinModal/ScanVinModal.css";
 import "../../components/BaseModal/BaseModal.css";
 
 const HomePage: React.FC = () => {
-  const [showAddInvoice, setShowAddInvoice] = useState(false);
   const [showScanVin, setShowScanVin] = useState(false);
   const [showCustomerSelect, setShowCustomerSelect] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -28,19 +26,19 @@ const HomePage: React.FC = () => {
   return (
     <div className="home-page">
       <div>
-        <button onClick={() => setShowAddInvoice(true)}>
-          Add or Create Invoice
-        </button>
         <button
           onClick={() =>
             navigate("/invoice", {
               state: { selectedCustomer, vehicle: vinResult },
             })
           }
+          disabled={!selectedCustomer}
         >
           Review & Send Invoice
         </button>
-        <button onClick={() => setShowScanVin(true)}>Scan VIN</button>
+        <button onClick={() => setShowScanVin(true)} disabled={!selectedCustomer}>
+          Scan VIN
+        </button>
         <button onClick={() => setShowCustomerSelect(true)}>
           Select Customer
         </button>
@@ -55,15 +53,6 @@ const HomePage: React.FC = () => {
         </p>
       )}
 
-      {showAddInvoice && selectedCustomer && (
-        <CreateInvoiceModal
-          customerId={selectedCustomer.id}
-          onClose={() => setShowAddInvoice(false)}
-          onInvoiceCreated={() => {
-            // Optional: handle it if needed
-          }}
-        />
-      )}
       {showScanVin && (
         <ScanVinModal
           onClose={() => setShowScanVin(false)}
@@ -81,6 +70,7 @@ const HomePage: React.FC = () => {
           onClose={() => setShowVinResultsModal(false)}
         />
       )}
+
       {showCustomerSelect && (
         <CustomerSelectModal
           onClose={() => setShowCustomerSelect(false)}
@@ -93,6 +83,7 @@ const HomePage: React.FC = () => {
           openResultsModal={() => setShowVinResultsModal(true)}
         />
       )}
+
       {showChangePassword && (
         <ChangePasswordModal onClose={() => setShowChangePassword(false)} />
       )}
