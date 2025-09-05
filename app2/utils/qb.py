@@ -156,7 +156,7 @@ async def get_today_invoice_only(customer_id: str, qb_access_token: str, realm_i
         r.raise_for_status()
         return r.json().get("Invoice", {})
 
-    return None
+    return { "Id": None }
 
 
 async def append_invoice_line(invoice_id: str, description: str, qty: float, rate: float, item_id: str, qb_access_token: str, realm_id: str):

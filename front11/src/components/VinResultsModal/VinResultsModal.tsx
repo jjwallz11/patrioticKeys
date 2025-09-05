@@ -35,9 +35,9 @@ const VinResultsModal: React.FC<VinResultsModalProps> = ({
         );
         if (res.ok) {
           const data = await res.json();
-          setInvoiceId(data.invoice_id); // Adjust based on your actual key
+          setInvoiceId(data.Id);
         } else {
-          setInvoiceId(null); // No invoice today
+          setInvoiceId(null);
         }
       } catch (err: any) {
         setError("Could not check for invoice.");
