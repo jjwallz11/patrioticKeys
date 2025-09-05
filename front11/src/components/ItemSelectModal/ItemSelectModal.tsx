@@ -30,7 +30,7 @@ const ItemSelectModal = ({ onClose, onItemSelect }: ItemSelectModalProps) => {
         const data = await res.json();
         setItems(
           (data.items || []).map((item: any) => ({
-            id: item.Id,
+            id: String(item.Id),
             name: item.Name,
             description: item.Description,
           }))
